@@ -1,37 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, ImageSourcePropType, StyleSheet, Button, Platform } from "react-native";
+import { View, Text, TouchableOpacity, Image, ImageSourcePropType, StyleSheet, Button, Platform, PermissionsAndroid } from "react-native";
 import MapView, {Region, Marker} from "react-native-maps";
 import { request, PERMISSIONS, check, RESULTS } from "react-native-permissions";
 import Geolocation from "@react-native-community/geolocation";
 
 const MapsScreen = () => {
     const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'unavailable' | 'blocked' | 'limited' | 'loading'>('loading');
-
-    const requestLocationPermission = async () => {
-        if (Platform.OS === 'android') {
-        try {
-            const fine = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-
-            if (fine === RESULTS.GRANTED) {
-            setLocationPermission('granted');
-            } else if (fine === RESULTS.DENIED) {
-            setLocationPermission('denied');
-            } else if (fine === RESULTS.BLOCKED) {
-            setLocationPermission('blocked');
-            } else {
-            setLocationPermission('unavailable');
-            }
-        } catch (error) {
-            console.warn('Permission error:', error);
-            setLocationPermission('unavailable');
-        }
-        }
-    };
-
-    useEffect(() => {
-        // requestLocationPermission();
-    }, []);
-
 
     const [region, setRegion] = useState<Region>({
         latitude: 13.9411,
@@ -56,21 +30,37 @@ const MapsScreen = () => {
                 initialRegion={region}
                 onRegionChangeComplete={onRegionChange}
                 showsUserLocation={true}
-                showsMyLocationButton={true}    
-                followsUserLocation= {true}
-                loadingEnabled
-                zoomControlEnabled={true}
+                showsMyLocationButton={true}
+                followsUserLocation={true}
                 showsCompass={true}
-                minZoomLevel={1}
+                loadingEnabled={true}
+                zoomControlEnabled={true}
                 zoomEnabled={true}
-            />
+                minZoomLevel={1}
+                onMapReady={async () => {
+                    try {
+                    const granted = await PermissionsAndroid.request(
+                        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+                    );
+
+                    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                        console.log('Location permission granted');
+                        setLocationPermission('granted');
+                    } else {
+                        console.log('Location permission denied');
+                        setLocationPermission('denied');
+                    }
+                    } catch (error) {
+                    console.warn('Permission request failed', error);
+                    setLocationPermission('unavailable');
+                    }
+                }}
+                />
+
 
             {/* Overlay the UI on top of the map */}
             <View style={styles.overlay}>
                 <Text>Location Permission Status: {locationPermission}</Text>
-                {locationPermission !== 'granted' && (
-                <Button title="Request Again" onPress={requestLocationPermission} />
-                )}
             </View>
         </View>
     );
@@ -85,14 +75,14 @@ const styles = StyleSheet.create({
     },
     overlay: {
         position: 'absolute',
-        top: 20,
-        left: 20,
+        top: 11,
+        left: 60,
         right: 20,
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 10,
         padding: 10,
         zIndex: 10,
-        width: "70%"
+        width: "65%",
     },
 });
 
