@@ -162,7 +162,7 @@ const MapsScreen = () => {
         initialRegion={region}
         onRegionChangeComplete={onRegionChange}
         onMapReady={onMapReady}
-        showsUserLocation={true}
+        showsUserLocation={showUserLocation}
         showsMyLocationButton={true}
         followsUserLocation={true}
         showsCompass={true}
