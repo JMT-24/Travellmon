@@ -1,13 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Platform, PermissionsAndroid, Button } from "react-native";
 import MapView, { Region, Marker, Polyline } from "react-native-maps";
-import Geolocation, {GeolocationError, GeolocationOptions, GeolocationResponse} from "@react-native-community/geolocation";
-import { getPathLength, getDistance } from "geolib";
+// import Geolocation, {GeolocationError, GeolocationOptions, GeolocationResponse} from "@react-native-community/geolocation";
+// import { getPathLength, getDistance } from "geolib";
 
+import {Coordinate} from '../AppNavigator';
 
-type Coordinate = { latitude: number; longitude: number; timestamp: number; };
+interface Props {
+  setCurrentSpeed: (speed: number) => void;
+  speed: number;
+  setSeconds: React.Dispatch<React.SetStateAction<number>>;
+  seconds: number;
+  setDistance: (distance: number) => void;
+  distance: number;
+  routeCoordinates: Coordinate[];
+  setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinate[]>>;
+};
 
-const MapsScreen = () => {
+const MapsScreen: React.FC<Props> = ({setCurrentSpeed, setSeconds, setDistance, speed, seconds, distance,
+  setRouteCoordinates, routeCoordinates
+}) => {
   const [locationPermission, setLocationPermission] = useState<
     'granted' | 'denied' | 'unavailable' | 'blocked' | 'limited' | 'loading'
   >('loading');
@@ -27,7 +39,7 @@ const MapsScreen = () => {
         );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Location permission granted');
+          // console.log('Location permission granted');
           setLocationPermission('granted');
         } else {
           console.log('Location permission denied');
@@ -40,10 +52,6 @@ const MapsScreen = () => {
     }
   };
 
-  useEffect(() => {
-    requestLocationPermission();
-  }, []);
-
   const onRegionChange = (newRegion: Region) => {
     // setRegion(newRegion);
     // console.log("Region changes:", newRegion);
@@ -55,104 +63,19 @@ const MapsScreen = () => {
     setShowUserLocation(true);
   }
 
-  const [isRecording, setIsRecording] = useState(false);
-  const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
-  const watchId = useRef<number | null>(null);
-  const [currentSpeed, setCurrentSpeed] = useState<number>(0);
-
-  const startRecording = () => {
-    setIsRecording(true);
-    startTimer();
-
-    const options: GeolocationOptions = {
-      enableHighAccuracy: true,
-      distanceFilter: 5,
-      timeout: 10000,
-      maximumAge: 1000,
+  useEffect(() => {
+     const handlePermission = async () => {
+      await requestLocationPermission(); // Await here if it's async
     };
 
-    watchId.current = Geolocation.watchPosition(
-      (position: GeolocationResponse) => {
-        const { latitude, longitude } = position.coords;
-        const timestamp = position.timestamp;
-
-        setRouteCoordinates(prev => {
-          if (prev.length === 0) {
-            return [{ latitude, longitude, timestamp }];
-          }
-
-          const last = prev[prev.length - 1];
-          const distance = getDistance(
-            { latitude: last.latitude, longitude: last.longitude },
-            { latitude, longitude }
-          ); // in meters
-
-          const timeSeconds = (timestamp - last.timestamp) / 1000; // ms → s
-          const speedKms = (distance / 1000) / timeSeconds;
-          const speedKmh = speedKms * 3600;
-
-          console.log(`Speed: ${speedKms.toFixed(4)} km/s`);
-          console.log(`Speed: ${speedKmh.toFixed(2)} km/h`);
-          setCurrentSpeed(speedKmh);
-          return [...prev, { latitude, longitude, timestamp }];
-        });
-      },
-      (error: GeolocationError) => {
-        console.error('Geolocation error:', error.message);
-      },
-      options
-    );
-  };
-
-
-  const stopRecording = () => {
-    setIsRecording(false);
-    stopTimer();
-    if (watchId.current !== null) {
-      Geolocation.clearWatch(watchId.current);
-      watchId.current = null;
-    }
-  };
-
-  const resetRoute = () => {
-    stopRecording();
-    setRouteCoordinates([]);
-    resetTimer();
-  };
-
-  const [seconds, setSeconds] = useState(0);
-  const [running, setRunning] = useState(false);
-  const internalRev = useRef<NodeJS.Timeout | null>(null);
-  
-  const startTimer = () => {
-    if (!running) {
-      setRunning(true);
-      internalRev.current = setInterval(() => {
-        setSeconds(prev => prev + 1);
-      }, 1000);
-    }
-  };
-
-  const stopTimer = () => {
-    if (internalRev.current) {
-      clearInterval(internalRev.current);
-      internalRev.current = null;
-    }
-    setRunning(false);
-  };
-
-  const resetTimer = () => {
-    stopTimer();
-    setSeconds(0);
-  };
+    handlePermission();
+  });
 
   const formatTime = (totalSeconds : number) => {
-    const mins = Math.floor(totalSeconds/60);
-    const secs = totalSeconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
-
-  const distanceInKm = getPathLength(routeCoordinates) / 1000;
+        const mins = Math.floor(totalSeconds/60);
+        const secs = totalSeconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
 
     return (
     <View style={styles.container}>
@@ -178,18 +101,13 @@ const MapsScreen = () => {
             strokeWidth={7}
           />
         )}
+        
       </MapView>
 
       <View style={styles.meter}>
-        <Text style={styles.meterText}>{formatTime(seconds)}</Text>
-        <Text style={styles.meterText}>{distanceInKm.toFixed(2)} km</Text>
-        <Text style={styles.meterText}>{currentSpeed.toFixed(2)} km/h</Text>
-      </View>
-
-      <View style={styles.controls}>
-        <Button title="Record" onPress={startRecording} disabled={isRecording} />
-        <Button title="End" onPress={stopRecording} disabled={!isRecording} />
-        <Button title="Reset" onPress={resetRoute} />
+          <Text style={styles.meterText}>{formatTime(seconds)}</Text>
+          <Text style={styles.meterText}>{distance.toFixed(2)} km</Text>
+          <Text style={styles.meterText}>{speed.toFixed(2)} km/h</Text>
       </View>
     </View>
   );
@@ -218,31 +136,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-   controls: {
-    position: 'absolute',
-    bottom: 30,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    padding: 10,
-    borderRadius: 10,
-  },
   meter: {
-    position: 'absolute',
-    bottom: 100,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    padding: 10,
-    borderRadius: 10,
-  },
-  meterText: {
-
-  },
+        position: 'absolute',
+        top: 12,
+        left: 70,
+        right: 70,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: 'rgba(159, 159, 159, 0.9)',
+        padding: 10,
+        borderRadius: 10,
+    },
+    meterText: {
+      fontWeight: "bold",
+    },
 });
 
 export default MapsScreen;

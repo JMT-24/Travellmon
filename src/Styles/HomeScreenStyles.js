@@ -14,6 +14,45 @@ const styles = StyleSheet.create({
         color: "black",
         fontSize: 20,
     },
-});
+    meter: {
+        position: 'absolute',
+        bottom: 100,
+        left: 20,
+        right: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        padding: 10,
+        borderRadius: 10,
+    },
+    meterText: {
 
-export default styles;
+    },
+    controls: {
+        position: 'absolute',
+        bottom: 30,
+        left: 20,
+        right: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        padding: 10,
+        borderRadius: 10,
+    },
+    meter: {
+        position: 'absolute',
+        bottom: 100,
+        left: 20,
+        right: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        padding: 10,
+        borderRadius: 10,
+    },
+    meterText: {
+
+        },
+    });
+
+    export default styles;

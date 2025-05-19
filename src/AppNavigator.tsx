@@ -1,5 +1,5 @@
-import React from 'react';
-import { Image, ImageSourcePropType } from 'react-native';
+import React, {useState} from 'react';
+import { Image, ImageSourcePropType} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from './Screens/HomeScreen';
@@ -12,13 +12,23 @@ const globeIcon: ImageSourcePropType = require('./Assets/Icons/globeIcon.png');
 
 const Tab = createBottomTabNavigator();
 
+export type Coordinate = { 
+    latitude: number; 
+    longitude: number; 
+    timestamp: number; 
+};
+
 const AppNavigator = () => {
+const [currentSpeed, setCurrentSpeed] = useState<number>(0);
+const [seconds, setSeconds] = useState(0);
+const [distance, setDistance] = useState(0);
+const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
+
   return (
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
           options={{
             headerShown: true,
             tabBarIcon: ({ color, size, focused }) => (
@@ -33,26 +43,51 @@ const AppNavigator = () => {
               />
             ),
           }}
-        />
+        >
+          {() => (
+            <HomeScreen
+              setCurrentSpeed={setCurrentSpeed}
+              setSeconds={setSeconds}
+              setDistance={setDistance}
+              speed={currentSpeed}
+              seconds={seconds}
+              distance={distance}
+              setRouteCoordinates={setRouteCoordinates}
+              routeCoordinates={routeCoordinates}
+            />
+          )}
+        </Tab.Screen>
 
         <Tab.Screen
           name="Maps"
-          component={MapsScreen}
           options={{
             headerShown: true,
             tabBarIcon: ({ color, size, focused }) => (
               <Image
-                source={globeIcon} 
+                source={globeIcon}
                 style={{
                   width: size,
                   height: size,
                   resizeMode: 'contain',
-                  tintColor: focused ? color : 'gray', 
+                  tintColor: focused ? color : 'gray',
                 }}
               />
             ),
           }}
-        />
+        >
+          {() => (
+            <MapsScreen
+              setCurrentSpeed={setCurrentSpeed}
+              setSeconds={setSeconds}
+              setDistance={setDistance}
+              speed={currentSpeed}
+              seconds={seconds}
+              distance={distance}
+              setRouteCoordinates={setRouteCoordinates}
+              routeCoordinates={routeCoordinates}
+            />
+          )}
+        </Tab.Screen>
 
         <Tab.Screen
           name="Settings"
