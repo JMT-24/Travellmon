@@ -25,8 +25,7 @@ const [distance, setDistance] = useState(0);
 const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
+    <Tab.Navigator>
 
         <Tab.Screen
           name="Home"
@@ -110,7 +109,6 @@ const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
         />
 
       </Tab.Navigator>
-    </NavigationContainer>
   );
 };
 

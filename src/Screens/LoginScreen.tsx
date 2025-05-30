@@ -2,12 +2,8 @@ import React , {useState, useEffect}from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
 
-type Props = {
-    
-};
 
-
-const LoginScreen: React.FC<Props> = () => {
+const LoginScreen = ({navigation}: any) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -20,6 +16,7 @@ const LoginScreen: React.FC<Props> = () => {
         // Handle login logic here
         console.log("Username:", username);
         console.log("Password:", password);
+        navigation.replace("MainApp"); // Navigate to the main app screen after login
     };
 
     const handleUsernameChange = (text: string) => {
