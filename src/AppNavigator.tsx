@@ -27,6 +27,7 @@ const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
   return (
     <NavigationContainer>
       <Tab.Navigator>
+
         <Tab.Screen
           name="Home"
           options={{
