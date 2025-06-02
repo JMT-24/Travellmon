@@ -3,9 +3,10 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
 
 
-const LoginScreen = ({navigation}: any) => {
+const RegisterScreen = ({navigation}: any) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [cpassword, setCPassword] = useState("");
 
     useEffect(() => {
         // This effect can be used to handle any side effects related to the login screen
@@ -34,19 +35,12 @@ const LoginScreen = ({navigation}: any) => {
         }
     };
 
-    const handleRegBtn = () => {
-        navigation.replace("Register");
-    }
-
     return (
         <View style={styles.container}>
             <View style={styles.loginContainer}>
-                <View style={styles.topContainer}>
-                    <Text style={styles.appText}>Travellmon</Text>
-                </View>
                 <View style={styles.middleContainer}>
 
-                    <Text style={styles.titleText}>Login Screen</Text>
+                    <Text style={styles.titleText}>Register Screen</Text>
                     <View style={styles.inputContainer}>
                         <View style={styles.usernameContainer}>
                             <TextInput
@@ -63,11 +57,19 @@ const LoginScreen = ({navigation}: any) => {
                                 onChangeText={handlePasswordChange}
                             />
                         </View>
+                        <View style={styles.usernameContainer}>
+                            <TextInput
+                                placeholder="Username"
+                                style={styles.input}
+                                onChangeText={handleUsernameChange}
+                            />
+                        </View>
+
                         <TouchableOpacity onPress={handleLoginPress} style={styles.loginButton}>
-                            <Text style={styles.buttonText}>Login</Text>   
+                            <Text style={styles.buttonText}>Register</Text>   
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleRegBtn} style={styles.registerButton}>
-                            <Text style={styles.regBtnText}>     Register     </Text>   
+                        <TouchableOpacity onPress={() => console.log("reg")} style={styles.registerButton}>
+                            <Text style={styles.regBtnText}>     Login     </Text>   
                         </TouchableOpacity>
                     </View>
 
@@ -163,4 +165,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default RegisterScreen;

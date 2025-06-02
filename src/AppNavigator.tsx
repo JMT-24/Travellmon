@@ -31,8 +31,8 @@ export type Coordinate = {
   const [seconds, setSeconds] = useState(0);
   const [distance, setDistance] = useState(0);
   const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
-  const [monsterExp, setMonsterExp] = useState(0);
-  const [monsterLvl, setMonsterLvl] = useState(0);
+  const [monsterExp, setMonsterExp] = useState<number>(0);
+  const [monsterLvl, setMonsterLvl] = useState<number>(0);
 
   return (
     <Tab.Navigator>
@@ -60,6 +60,7 @@ export type Coordinate = {
             <HomeScreen
               monsterExp={monsterExp}
               monsterLvl={monsterLvl}
+              setMonsterLvl={setMonsterLvl}
             />
           )}
         </Tab.Screen>

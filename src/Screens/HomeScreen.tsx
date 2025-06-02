@@ -16,12 +16,31 @@ const monsterPic: ImageSourcePropType = require('../Assets/Img/placeholderMonste
 interface Props {
     monsterExp: number;
     monsterLvl: number;
+    setMonsterLvl: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const HomeScreen: React.FC<Props> = ({ monsterExp, monsterLvl}) => {
+const HomeScreen: React.FC<Props> = ({ monsterExp, monsterLvl, setMonsterLvl}) => {
     const steps = 5;
     const [exp, setExp] = useState(0);
     const maxExp = 100;
+
+    const handleGainExp = () => {
+        const newExp = exp + steps;
+
+        if (newExp >= maxExp) {
+            setMonsterLvl(prev => prev + 1);
+            setExp(0);
+        } else {
+            setExp(newExp); 
+        }
+    };
+
+
+    const handleReset = () => {
+        setMonsterLvl(0);
+        setExp(0);
+    }
+
     return (
         <View style={styles.body}>
             <View style={styles.container}>
@@ -37,8 +56,8 @@ const HomeScreen: React.FC<Props> = ({ monsterExp, monsterLvl}) => {
 
                 <ExpBar monsterExp={exp} monsterLvl={monsterLvl} maxExp={maxExp} />
                 <ExpBar2 currentExp={exp} maxExp={maxExp} />
-                <Button title="Gain EXP" onPress={() => setExp(prev => Math.min(prev + steps, maxExp))} />
-                <Button title="Reset EXP" onPress={() => setExp(0)} />
+                <Button title="Gain EXP" onPress={handleGainExp} />
+                <Button title="Reset EXP" onPress={handleReset} />
                 
             </View>  
         </View>
