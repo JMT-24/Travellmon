@@ -4,55 +4,63 @@ const styles = StyleSheet.create({
     body: {
         justifyContent: "center",
         alignItems: "center",
+        // backgroundColor: "yellow",
+        height: "100%",
     },
     container: {
-        //backgroundColor: "blue",
-        width: "90%",
+        // backgroundColor: "lightblue",
+        width: "95%",
         height: "90%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        borderBlockColor: "black",
+        paddingHorizontal: "4%",
+        // borderWidth: 2,
     },
-    appText: {
-        color: "black",
-        fontSize: 20,
+    nameContainer: {
+        // backgroundColor: "pink",
+        width: "80%",
+        height: "5%",
+        alignItems: "center",
+        justifyContent: "center",
     },
-    meter: {
-        position: 'absolute',
-        bottom: 100,
-        left: 20,
-        right: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        padding: 10,
-        borderRadius: 10,
+    nameText: {
+        fontSize: 27,
+        fontWeight: "bold",
     },
-    meterText: {
 
+    imageContainer: {
+        height: "40%",
+        width: "80%",
+        backgroundColor: "gray",
+        margin: 15,
+        borderWidth: 1,
+        borderColor: "black",
     },
-    controls: {
-        position: 'absolute',
-        bottom: 30,
-        left: 20,
-        right: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        padding: 10,
-        borderRadius: 10,
+    monsterPic: {
+        height: "100%",
+        width: "100%",
     },
-    meter: {
-        position: 'absolute',
-        bottom: 100,
-        left: 20,
-        right: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        padding: 10,
-        borderRadius: 10,
+    placeholderWarningText: {
+        position: "absolute",
+        color: "white",
+        fontSize: 40,
+        top: "20%",    
+        fontWeight: "bold",
+        textAlign: "center",
+        textShadowColor: 'black',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 1,
+        // To simulate stroke better, you can repeat shadow in multiple directions
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 3,
+        opacity: 0.25,
     },
-    meterText: {
 
-        },
     });
 
-    export default styles;
+export default styles;

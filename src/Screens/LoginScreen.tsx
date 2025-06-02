@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#FFF4E1",
+        // backgroundColor: "#FFF4E1",
     },
     loginContainer: {
         width: "80%",

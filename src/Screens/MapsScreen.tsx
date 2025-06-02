@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     },
     meterText: {
       fontWeight: "bold",
+      color: "white",
     },
 });
 
