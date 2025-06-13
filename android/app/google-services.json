@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "505932931956",
+    "project_id": "travellmon-8b418",
+    "storage_bucket": "travellmon-8b418.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505932931956:android:a0073909e0cf9da1ed0221",
+        "android_client_info": {
+          "package_name": "com.travellmon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQWOrYTqBrIsacl_Z2o8Pem3MOnWF5sYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
