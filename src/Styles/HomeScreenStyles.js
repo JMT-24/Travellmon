@@ -2,15 +2,15 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     body: {
-        justifyContent: "center",
+        justifyContent: "flex-end",
         alignItems: "center",
-        // backgroundColor: "yellow",
+        backgroundColor: "#FFA733",
         height: "100%",
     },
     container: {
-        // backgroundColor: "lightblue",
-        width: "95%",
-        height: "90%",
+        backgroundColor: "#1f1c1b",
+        width: "98%",
+        height: "98%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         // borderWidth: 2,
     },
     nameContainer: {
-        // backgroundColor: "pink",
+        backgroundColor: "#FFA733",
         width: "80%",
         height: "5%",
         alignItems: "center",
@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     nameText: {
         fontSize: 27,
         fontWeight: "bold",
+        color: "#5A3200",
     },
 
     imageContainer: {

@@ -4,6 +4,7 @@ import Geolocation, {GeolocationError, GeolocationOptions, GeolocationResponse} 
 import { getPathLength, getDistance } from "geolib";
 import styles from '../Styles/GoScreenStyles';
 import { Coordinate } from '../AppNavigator';
+import Video from 'react-native-video';
 
 import MeasureCard from '../Components/MeasureCard';
 
@@ -26,11 +27,15 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
     routeCoordinates, setRouteCoordinates, monsterExp, setMonsterExp, setMonsterLvl
 }) => {
     const [isRecording, setIsRecording] = useState(false);
+    const [paused, setPaused] = useState(false); // <-- new state
     const watchId = useRef<number | null>(null);
     const speedResetTimeout = useRef<NodeJS.Timeout | null>(null);
+    const [isWalking, setIsWalking] = useState(false);
 
     const startRecording = () => {
+        setIsWalking(true);
         setIsRecording(true);
+        setPaused(false); // <-- reset paused state
         startTimer();
 
         const options: GeolocationOptions = {
@@ -85,7 +90,9 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
     };
 
     const stopRecording = () => {
+        setIsWalking(false);
         setIsRecording(false);
+        setPaused(false); // <-- reset paused state
         stopTimer();
         if (watchId.current !== null) {
         Geolocation.clearWatch(watchId.current);
@@ -100,6 +107,79 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
 
         // Also reset speed to 0 when stopping
         setCurrentSpeed(0);
+    };
+
+    const pauseRecording = () => {
+        setIsWalking(false);
+        setPaused(true);
+        setIsRecording(false);
+        stopTimer();
+        if (watchId.current !== null) {
+            Geolocation.clearWatch(watchId.current);
+            watchId.current = null;
+        }
+        if (speedResetTimeout.current) {
+            clearTimeout(speedResetTimeout.current);
+            speedResetTimeout.current = null;
+        }
+        setCurrentSpeed(0);
+    };
+
+    const resumeRecording = () => {
+        setIsWalking(true);
+        setPaused(false);
+        setIsRecording(true);
+        startTimer();
+
+        const options: GeolocationOptions = {
+            enableHighAccuracy: true,
+            distanceFilter: 5,
+            timeout: 10000,
+            maximumAge: 1000,
+        };
+
+        watchId.current = Geolocation.watchPosition(
+            (position: GeolocationResponse) => {
+                const { latitude, longitude } = position.coords;
+                const timestamp = position.timestamp;
+
+                setRouteCoordinates(prev => {
+                if (prev.length === 0) {
+                    return [{ latitude, longitude, timestamp }];
+                }
+
+                const last = prev[prev.length - 1];
+                const distance = getDistance(
+                    { latitude: last.latitude, longitude: last.longitude },
+                    { latitude, longitude }
+                );
+
+                const timeSeconds = (timestamp - last.timestamp) / 1000;
+                const speedKms = (distance / 1000) / timeSeconds;
+                const speedKmh = speedKms * 3600;
+
+                // console.log(`Speed: ${speedKms.toFixed(4)} km/s`);
+                // console.log(`Speed: ${speedKmh.toFixed(2)} km/h`);
+                setCurrentSpeed(speedKmh);
+
+                // Clear previous speed reset timer
+                if (speedResetTimeout.current) {
+                    clearTimeout(speedResetTimeout.current);
+                }
+
+                // Set speed to 0 if no updates within 5 seconds
+                speedResetTimeout.current = setTimeout(() => {
+                    setCurrentSpeed(0);
+                }, 5000);
+
+                return [...prev, { latitude, longitude, timestamp }];
+                });
+            },
+            (error: GeolocationError) => {
+                console.error('Geolocation error:', error.message);
+            },
+            options
+        );
     };
 
     const [running, setRunning] = useState(false);
@@ -178,7 +258,16 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                 </View>
 
                 <View style={styles.midView}>
-
+                    <Video
+                        source={require('../Assets/videos/walking.mp4')}
+                        style={styles.animation}
+                        resizeMode="contain"
+                        repeat
+                        muted
+                        playInBackground={false}
+                        playWhenInactive={false}
+                        paused={!isWalking} // <--- this is the key line
+                    />
                 </View>
 
                 <View style={styles.botView}>
@@ -191,24 +280,44 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
 
             
             <View style={styles.controls}>
-                <TouchableOpacity
-                    style={[
-                        styles.startButton,
-                        isRecording && styles.disabledButton
-                    ]}
-                    onPress={startRecording}
-                    disabled={isRecording}
-                    activeOpacity={0.7}
-                >
-                    <Text style={styles.buttonText}>Start</Text>
-                </TouchableOpacity>
+                {!isRecording && !paused && (
+                    <TouchableOpacity
+                        style={[
+                            styles.startButton,
+                            isRecording && styles.disabledButton
+                        ]}
+                        onPress={startRecording}
+                        disabled={isRecording}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.buttonText}>Start</Text>
+                    </TouchableOpacity>
+                )}
+                {isRecording && !paused && (
+                    <TouchableOpacity
+                        style={styles.pauseButton}
+                        onPress={pauseRecording}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.buttonText}>Pause</Text>
+                    </TouchableOpacity>
+                )}
+                {paused && (
+                    <TouchableOpacity
+                        style={styles.resumeButton}
+                        onPress={resumeRecording}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.buttonText}>Resume</Text>
+                    </TouchableOpacity>
+                )}
                 <TouchableOpacity
                     style={[
                         styles.endButton,
-                        !isRecording && styles.disabledButton
+                        (!isRecording && !paused) && styles.disabledButton
                     ]}
                     onPress={stopRecording}
-                    disabled={!isRecording}
+                    disabled={!isRecording && !paused}
                     activeOpacity={0.7}
                 >
                     <Text style={styles.buttonText}>End</Text>

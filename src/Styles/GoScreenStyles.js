@@ -12,7 +12,8 @@ const styles = StyleSheet.create({
     
 
     monsterDisplayContainer: {
-        backgroundColor: "gray",
+        // backgroundColor: "gray",
+        backgroundColor: "white",
         height: "80%",
         width: "95%",
         justifyContent: "space-around"
@@ -27,8 +28,14 @@ const styles = StyleSheet.create({
     midView: {
         // backgroundColor: "violet",
         height: "60%",
-        width: "100%"
-
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    animation: {
+        width: "60%",
+        height: "60%",
+        marginTop: 20,
     },
     botView: {
         // backgroundColor: "lightgreen",
@@ -38,16 +45,19 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     timerText: {
-        color: "white",
+        // color: "white",
+        color: "black",
         fontSize: 27,
         fontWeight: "bold",
     },
     speedText: {
-        color: "white",
+        // color: "white",
+        color: "black",
         fontSize: 30,
     },
     distanceText: {
-        color: "white",
+        // color: "white",
+        color: "black",
         fontSize: 23,
     },
 
@@ -94,6 +104,26 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         borderWidth: 1,
         borderColor: "blue",
+    },
+    pauseButton: {
+        backgroundColor: '#ffd966',
+        height: "95%",
+        width: "30%",
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: "center",
+        borderWidth: 1,
+        borderColor: "#b59f3b",
+    },
+    resumeButton: {
+        backgroundColor: '#66b3ff',
+        height: "95%",
+        width: "30%",
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: "center",
+        borderWidth: 1,
+        borderColor: "#1c5fa8",
     },
     
     buttonText: {

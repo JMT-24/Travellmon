@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { getApp } from '@react-native-firebase/app';
 
 //Screens
 import AppNavigator from './src/AppNavigator';
@@ -11,6 +12,10 @@ import RegisterScreen from './src/Screens/RegisterScreen';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
+  useEffect(() => {
+    console.log('Firebase initialized:', getApp().name);
+  }, []);
+
   return (
     // <GestureHandlerRootView style={{ flex: 1 }}>
     //   {/* <AppNavigator /> */}

@@ -1,10 +1,12 @@
 import React , {useState, useEffect}from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
+import { getApp } from "@react-native-firebase/app";
+import { getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth";
 
 
 const LoginScreen = ({navigation}: any) => {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     useEffect(() => {
@@ -14,28 +16,45 @@ const LoginScreen = ({navigation}: any) => {
 
     const handleLogin = () => {
         // Handle login logic here
-        console.log("Username:", username);
+        console.log("Email:", email);
         console.log("Password:", password);
         navigation.replace("MainApp"); // Navigate to the main app screen after login
     };
 
-    const handleUsernameChange = (text: string) => {
-        setUsername(text);
+    const handleEmailChange = (text: string) => {
+        setEmail(text);
     };
     const handlePasswordChange = (text: string) => {
         setPassword(text);
     };
 
     const handleLoginPress = () => {
-        if (username && password) { 
-            handleLogin();
+        if (email && password) { 
+            // handleLogin();
+            login();
         } else {
-            console.log("Please enter both username and password");
+            console.log("Please enter both email and password");
         }
     };
 
     const handleRegBtn = () => {
         navigation.replace("Register");
+    }
+
+    const login = async () => {
+        console.log("Email:", email);
+        console.log("Password:", password);   
+        console.log("login button is clicked");
+        try {
+            const app = getApp();
+            const authInstance = getAuth(app);
+            const userCredentials = await signInWithEmailAndPassword(authInstance, email, password);
+            console.log("logged in: ", userCredentials.user.email);
+            handleLogin();
+        } catch (error: any) {
+            console.error("login error: ", error.message);
+        }
+        console.log("should be done");
     }
 
     return (
@@ -48,11 +67,11 @@ const LoginScreen = ({navigation}: any) => {
 
                     <Text style={styles.titleText}>Login Screen</Text>
                     <View style={styles.inputContainer}>
-                        <View style={styles.usernameContainer}>
+                        <View style={styles.emailContainer}>
                             <TextInput
-                                placeholder="Username"
+                                placeholder="Email"
                                 style={styles.input}
-                                onChangeText={handleUsernameChange}
+                                onChangeText={handleEmailChange}
                             />
                         </View>
                         <View style={styles.passwordContainer}>
@@ -63,7 +82,7 @@ const LoginScreen = ({navigation}: any) => {
                                 onChangeText={handlePasswordChange}
                             />
                         </View>
-                        <TouchableOpacity onPress={handleLoginPress} style={styles.loginButton}>
+                        <TouchableOpacity onPress={login} style={styles.loginButton}>
                             <Text style={styles.buttonText}>Login</Text>   
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handleRegBtn} style={styles.registerButton}>
@@ -129,7 +148,7 @@ const styles = StyleSheet.create({
         width: "80%",
         marginTop: 20,
     },
-    usernameContainer: {
+    emailContainer: {
         marginBottom: 15,
     },
     input: {

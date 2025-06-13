@@ -9,6 +9,7 @@ import { Coordinate } from '../AppNavigator';
 import ExpBar from '../Components/ExpBar';
 import MeasureCard from '../Components/MeasureCard';
 import ExpBar2 from '../Components/ExpBar2';
+import BurgerMenu from '../Components/BurgerMenu';
 
 const monsterPic: ImageSourcePropType = require('../Assets/Img/placeholderMonster.jpg');
 
@@ -43,6 +44,7 @@ const HomeScreen: React.FC<Props> = ({ monsterExp, monsterLvl, setMonsterLvl}) =
 
     return (
         <View style={styles.body}>
+            <BurgerMenu />
             <View style={styles.container}>
 
                 <View style={styles.nameContainer}>
@@ -55,7 +57,7 @@ const HomeScreen: React.FC<Props> = ({ monsterExp, monsterLvl, setMonsterLvl}) =
                 </View>
 
                 <ExpBar monsterExp={exp} monsterLvl={monsterLvl} maxExp={maxExp} />
-                <ExpBar2 currentExp={exp} maxExp={maxExp} />
+                {/* <ExpBar2 currentExp={exp} maxExp={maxExp} /> */}
                 <Button title="Gain EXP" onPress={handleGainExp} />
                 <Button title="Reset EXP" onPress={handleReset} />
                 

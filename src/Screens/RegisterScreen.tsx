@@ -1,10 +1,11 @@
 import React , {useState, useEffect}from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
-
+import { getApp } from "@react-native-firebase/app";
+import { getAuth, createUserWithEmailAndPassword } from "@react-native-firebase/auth";
 
 const RegisterScreen = ({navigation}: any) => {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [cpassword, setCPassword] = useState("");
 
@@ -13,27 +14,29 @@ const RegisterScreen = ({navigation}: any) => {
         // For example, you could check if the user is already logged in and redirect accordingly
     }, []);
 
-    const handleLogin = () => {
-        // Handle login logic here
-        console.log("Username:", username);
-        console.log("Password:", password);
-        navigation.replace("MainApp"); // Navigate to the main app screen after login
-    };
+    const handleLoginBtn = () => {
+        navigation.replace("Login");
+    }
+    const handleEmailChange = (email: string) => {
+        setEmail(email);
+    }
+    const handlePasswordChange = (password: string) => {
+        setPassword(password);
+    }
 
-    const handleUsernameChange = (text: string) => {
-        setUsername(text);
-    };
-    const handlePasswordChange = (text: string) => {
-        setPassword(text);
-    };
-
-    const handleLoginPress = () => {
-        if (username && password) { 
-            handleLogin();
-        } else {
-            console.log("Please enter both username and password");
+    const register = async() => {
+        console.log("register button is clicked");
+        try {
+            const app = getApp();
+            const authInstance = getAuth(app);
+            const userCredentials = await createUserWithEmailAndPassword(authInstance, email, password);
+            console.log('user has registered" ', userCredentials.user.email)
+        } catch (error: any) {
+            console.error("Error message: ", error.message);
         }
-    };
+        console.log("should be done");
+    }
+    
 
     return (
         <View style={styles.container}>
@@ -42,11 +45,11 @@ const RegisterScreen = ({navigation}: any) => {
 
                     <Text style={styles.titleText}>Register Screen</Text>
                     <View style={styles.inputContainer}>
-                        <View style={styles.usernameContainer}>
+                        <View style={styles.emailContainer}>
                             <TextInput
-                                placeholder="Username"
+                                placeholder="Email"
                                 style={styles.input}
-                                onChangeText={handleUsernameChange}
+                                onChangeText={handleEmailChange}
                             />
                         </View>
                         <View style={styles.passwordContainer}>
@@ -57,18 +60,19 @@ const RegisterScreen = ({navigation}: any) => {
                                 onChangeText={handlePasswordChange}
                             />
                         </View>
-                        <View style={styles.usernameContainer}>
+                        <View style={styles.passwordContainer}>
                             <TextInput
-                                placeholder="Username"
+                                placeholder="Confirm Password"
+                                secureTextEntry={true}
                                 style={styles.input}
-                                onChangeText={handleUsernameChange}
+                                
                             />
                         </View>
 
-                        <TouchableOpacity onPress={handleLoginPress} style={styles.loginButton}>
+                        <TouchableOpacity onPress={register} style={styles.loginButton}>
                             <Text style={styles.buttonText}>Register</Text>   
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => console.log("reg")} style={styles.registerButton}>
+                        <TouchableOpacity onPress={handleLoginBtn} style={styles.registerButton}>
                             <Text style={styles.regBtnText}>     Login     </Text>   
                         </TouchableOpacity>
                     </View>
@@ -131,7 +135,7 @@ const styles = StyleSheet.create({
         width: "80%",
         marginTop: 20,
     },
-    usernameContainer: {
+    emailContainer: {
         marginBottom: 15,
     },
     input: {

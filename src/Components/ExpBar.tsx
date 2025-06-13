@@ -37,17 +37,17 @@ const styles = StyleSheet.create({
     expContainer: {
         height: "6%",
         width: "90%",
-        // backgroundColor: "lightgreen",
+        backgroundColor: "#804803",
         margin: 10,
-        borderWidth: 1,
-        borderColor: "black",
+        borderWidth: 2,
+        borderColor: "#FFA733",
     },
     barFill: {
         height: '100%',
-        backgroundColor: 'lightgreen',
+        backgroundColor: '#FFD700',
     },
     monsterLvl: {
-        color: "white",
+        color: "#FFA733",
         fontSize: 20, 
         position: "absolute",
         top: 5,
