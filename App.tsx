@@ -8,6 +8,7 @@ import { getApp } from '@react-native-firebase/app';
 import AppNavigator from './src/AppNavigator';
 import LoginScreen from './src/Screens/LoginScreen';
 import RegisterScreen from './src/Screens/RegisterScreen';
+import SettingsScreen from './src/Screens/SettingsScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -37,6 +38,11 @@ const App = () => {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

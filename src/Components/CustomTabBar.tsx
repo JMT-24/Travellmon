@@ -60,9 +60,11 @@ const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
     height: '95%',
-    backgroundColor: "#FFA733",
+    backgroundColor: "#A0522D",
     marginHorizontal: 4,
     justifyContent: 'center',
     alignItems: 'center',
+    borderColor: "#FFA733",
+    borderWidth: 2,
   },
 });

@@ -15,7 +15,7 @@ const ExpBar: React.FC<Props> = ({monsterExp, monsterLvl, maxExp}) => {
     useEffect(() => {
         Animated.timing(animatedWidth, {
             toValue: expPercent,
-            duration: 800,
+            duration: 500,
             useNativeDriver: false, // false because we animate width
         }).start();
     }, [expPercent]);

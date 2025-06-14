@@ -8,6 +8,7 @@ import { getAuth } from '@react-native-firebase/auth';
 import HomeScreen from './Screens/HomeScreen';
 import SettingsScreen from './Screens/SettingsScreen';
 import GoScreen from './Screens/GoScreen';
+import ProfileScreen from './Screens/ProfileScreen';
 
 //Components
 import MapsScreen from './Screens/MapsScreen';
@@ -19,6 +20,7 @@ const homeIcon: ImageSourcePropType = require('./Assets/Icons/homeIcon.png');
 const settingsIcon: ImageSourcePropType = require('./Assets/Icons/settingsIcon.png');
 const globeIcon: ImageSourcePropType = require('./Assets/Icons/globeIcon.png');
 const goIcon: ImageSourcePropType = require('./Assets/Icons/goIcon.png')
+const profileIcon: ImageSourcePropType = require('./Assets/Icons/profileIcon.png');
 
 const Tab = createBottomTabNavigator();
 
@@ -51,7 +53,7 @@ export type Coordinate = {
                   width: size,
                   height: size,
                   resizeMode: 'contain',
-                  tintColor: focused ? color : "#5A3200", 
+                  tintColor: focused ? color : "#FFA733", 
                 }}
               />
             ),
@@ -78,7 +80,7 @@ export type Coordinate = {
                   width: size,
                   height: size,
                   resizeMode: 'contain',
-                  tintColor: focused ? color : "#5A3200",
+                  tintColor: focused ? color : "#FFA733",
                 }}
               />
             ),
@@ -103,7 +105,6 @@ export type Coordinate = {
           options={{
             headerShown: false,
             headerTitleAlign: "center",
-            headerRight: () => <BurgerMenu />,
             tabBarIcon: ({ color, size, focused }) => (
               <Image
                 source={goIcon} 
@@ -111,7 +112,7 @@ export type Coordinate = {
                   width: size,
                   height: size,
                   resizeMode: 'contain',
-                  tintColor: focused ? color : "#5A3200", 
+                  tintColor: focused ? color : "#FFA733", 
                 }}
               />
             ),
@@ -135,19 +136,19 @@ export type Coordinate = {
         </Tab.Screen>
 
         <Tab.Screen
-          name="Settings"
-          component={SettingsScreen}
+          name="Profile"
+          component={ProfileScreen}
           options={{
             headerShown: false,
             headerTitleAlign: "center",
             tabBarIcon: ({ color, size, focused }) => (
               <Image
-                source={settingsIcon} 
+                source={profileIcon} 
                 style={{
                   width: size,
                   height: size,
                   resizeMode: 'contain',
-                  tintColor: focused ? color : "#5A3200", 
+                  tintColor: focused ? color : "#FFA733", 
                 }}
               />
             ),

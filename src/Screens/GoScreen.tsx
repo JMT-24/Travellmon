@@ -283,7 +283,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                 {!isRecording && !paused && (
                     <TouchableOpacity
                         style={[
-                            styles.startButton,
+                            styles.btnStyle,
                             isRecording && styles.disabledButton
                         ]}
                         onPress={startRecording}
@@ -295,7 +295,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                 )}
                 {isRecording && !paused && (
                     <TouchableOpacity
-                        style={styles.pauseButton}
+                        style={styles.btnStyle}
                         onPress={pauseRecording}
                         activeOpacity={0.7}
                     >
@@ -304,7 +304,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                 )}
                 {paused && (
                     <TouchableOpacity
-                        style={styles.resumeButton}
+                        style={styles.btnStyle}
                         onPress={resumeRecording}
                         activeOpacity={0.7}
                     >
@@ -313,7 +313,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                 )}
                 <TouchableOpacity
                     style={[
-                        styles.endButton,
+                        styles.btnStyle,
                         (!isRecording && !paused) && styles.disabledButton
                     ]}
                     onPress={stopRecording}
@@ -323,7 +323,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                     <Text style={styles.buttonText}>End</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.resetButton}
+                    style={styles.btnStyle}
                     onPress={resetRoute}
                     activeOpacity={0.7}
                 >

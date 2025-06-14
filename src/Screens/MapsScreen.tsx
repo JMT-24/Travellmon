@@ -78,44 +78,68 @@ const MapsScreen: React.FC<Props> = ({setCurrentSpeed, setSeconds, setDistance, 
     }
 
     return (
-    <View style={styles.container}>
-      <MapView
-        provider="google"
-        style={styles.map}
-        initialRegion={region}
-        onRegionChangeComplete={onRegionChange}
-        onMapReady={onMapReady}
-        showsUserLocation={showUserLocation}
-        showsMyLocationButton={true}
-        followsUserLocation={true}
-        showsCompass={true}
-        loadingEnabled={true}
-        zoomControlEnabled={true}
-        zoomEnabled={true}
-        minZoomLevel={1}
-      >
-        {routeCoordinates.length > 0 && (
-          <Polyline
-            coordinates={routeCoordinates}
-            strokeColor="#00BFFF"
-            strokeWidth={7}
-          />
-        )}
-        
-      </MapView>
+    <View style={styles.body}>
+      <View style={styles.background}>
+        <View style={styles.container}>
+          <MapView
+            provider="google"
+            style={styles.map}
+            initialRegion={region}
+            onRegionChangeComplete={onRegionChange}
+            onMapReady={onMapReady}
+            showsUserLocation={showUserLocation}
+            showsMyLocationButton={true}
+            followsUserLocation={true}
+            showsCompass={true}
+            loadingEnabled={true}
+            zoomControlEnabled={true}
+            zoomEnabled={true}
+            minZoomLevel={1}
+          >
+            {routeCoordinates.length > 0 && (
+              <Polyline
+                coordinates={routeCoordinates}
+                strokeColor="#00BFFF"
+                strokeWidth={7}
+              />
+            )}
+            
+          </MapView>
 
-      <View style={styles.meter}>
-          <Text style={styles.meterText}>{formatTime(seconds)}</Text>
-          <Text style={styles.meterText}>{distance.toFixed(2)} km</Text>
-          <Text style={styles.meterText}>{speed.toFixed(2)} km/h</Text>
+          <View style={styles.meter}>
+              <Text style={styles.meterText}>{formatTime(seconds)}</Text>
+              <Text style={styles.meterText}>{distance.toFixed(2)} km</Text>
+              <Text style={styles.meterText}>{speed.toFixed(2)} km/h</Text>
+          </View>
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  body: {
+    // backgroundColor: "lightblue",
+    height: "100%",
+    width: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "#1f1c1b",
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderTopWidth: 16,
+    borderColor: "#FFA733",
+  },
+  background: {
     flex: 1,
+    width: "100%",
+    backgroundColor: "#1f1c1b",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  container: {
+    height: "95%",
+    width: "95%",
   },
   map: {
     flex: 1,
@@ -137,20 +161,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   meter: {
-        position: 'absolute',
-        top: 12,
-        left: 70,
-        right: 70,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'rgba(159, 159, 159, 0.9)',
-        padding: 10,
-        borderRadius: 10,
+    position: 'absolute',
+    top: 12,
+    left: 70,
+    right: 70,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(31, 28, 27, 0.9)',
+    padding: 10,
+    borderRadius: 10,
     },
-    meterText: {
-      fontWeight: "bold",
-      color: "white",
-    },
+  meterText: {
+    fontWeight: "bold",
+    color: "#FFA733",
+  },
 });
 
 export default MapsScreen;
