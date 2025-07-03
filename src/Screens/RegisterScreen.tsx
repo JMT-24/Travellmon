@@ -3,11 +3,14 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "@react-native-firebase/auth";
+import { getFirestore, doc, setDoc, serverTimestamp } from "@react-native-firebase/firestore";
 
 const RegisterScreen = ({navigation}: any) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [cpassword, setCPassword] = useState("");
+    const [username, setUsername] = useState("");
+
 
     useEffect(() => {
         // This effect can be used to handle any side effects related to the login screen
@@ -23,19 +26,42 @@ const RegisterScreen = ({navigation}: any) => {
     const handlePasswordChange = (password: string) => {
         setPassword(password);
     }
+    const handleCPasswordChange = (cpassword: string) => {
+        setCPassword(cpassword);
+    }
 
-    const register = async() => {
-        console.log("register button is clicked");
+    const register = async () => {
+    console.log("register button is clicked");
+
+        // ✅ Check if passwords match
+        if (password !== cpassword) {
+            console.log("Passwords do not match!");
+            return;
+        }
+
         try {
             const app = getApp();
             const authInstance = getAuth(app);
+            const firestore = getFirestore(app); // use same app instance
             const userCredentials = await createUserWithEmailAndPassword(authInstance, email, password);
-            console.log('user has registered" ', userCredentials.user.email)
+            const user = userCredentials.user;
+
+            // Firestore entry for user
+            await setDoc(doc(firestore, "users", user.uid), {
+                email: user.email,
+                username: username,
+                createdAt: serverTimestamp(),
+            });
+
+            console.log('User has registered: ', user.email);
         } catch (error: any) {
-            console.error("Error message: ", error.message);
+            console.log("Error message: ", error.message);
+            console.log("Registration failed: " + error.message);
         }
+
         console.log("should be done");
-    }
+    };
+
     
 
     return (
@@ -45,6 +71,13 @@ const RegisterScreen = ({navigation}: any) => {
 
                     <Text style={styles.titleText}>Register Screen</Text>
                     <View style={styles.inputContainer}>
+                        <View style={styles.emailContainer}>
+                            <TextInput
+                                placeholder="Username"
+                                style={styles.input}
+                                onChangeText={setUsername}
+                            />
+                        </View>
                         <View style={styles.emailContainer}>
                             <TextInput
                                 placeholder="Email"
@@ -65,7 +98,7 @@ const RegisterScreen = ({navigation}: any) => {
                                 placeholder="Confirm Password"
                                 secureTextEntry={true}
                                 style={styles.input}
-                                
+                                onChangeText={handleCPasswordChange}
                             />
                         </View>
 

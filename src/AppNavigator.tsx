@@ -2,25 +2,26 @@ import React, {useEffect, useState} from 'react';
 import { Image, ImageSourcePropType} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { getAuth } from '@react-native-firebase/auth';
+
+//Services
+import { fetchCurrentUser } from './Database/userService';
+
+//Models
+import { User } from './Models/User';
 
 // Screens
 import HomeScreen from './Screens/HomeScreen';
+import MapsScreen from './Screens/MapsScreen';
 import SettingsScreen from './Screens/SettingsScreen';
 import GoScreen from './Screens/GoScreen';
 import ProfileScreen from './Screens/ProfileScreen';
 
 //Components
-import MapsScreen from './Screens/MapsScreen';
 import BurgerMenu from './Components/BurgerMenu';
 import CustomTabBar from './Components/CustomTabBar';
 
 //Icon Images
-const homeIcon: ImageSourcePropType = require('./Assets/Icons/homeIcon.png');
-const settingsIcon: ImageSourcePropType = require('./Assets/Icons/settingsIcon.png');
-const globeIcon: ImageSourcePropType = require('./Assets/Icons/globeIcon.png');
-const goIcon: ImageSourcePropType = require('./Assets/Icons/goIcon.png')
-const profileIcon: ImageSourcePropType = require('./Assets/Icons/profileIcon.png');
+import { homeIcon, settingsIcon,globeIcon, goIcon, profileIcon } from './Assets/Icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -37,6 +38,21 @@ export type Coordinate = {
   const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
   const [monsterExp, setMonsterExp] = useState<number>(0);
   const [monsterLvl, setMonsterLvl] = useState<number>(0);
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const user = await fetchCurrentUser();
+      if (user) {
+        setUser(user);
+      } else {
+        console.log('No user fetched');
+      }
+    };
+
+    loadUser();
+  }, []);
 
   
   return (
@@ -137,7 +153,6 @@ export type Coordinate = {
 
         <Tab.Screen
           name="Profile"
-          component={ProfileScreen}
           options={{
             headerShown: false,
             headerTitleAlign: "center",
@@ -153,7 +168,13 @@ export type Coordinate = {
               />
             ),
           }}
-        />
+        >
+          {() => (
+            <ProfileScreen
+              user={user}
+            />
+          )}
+        </Tab.Screen>
 
       </Tab.Navigator>
   );

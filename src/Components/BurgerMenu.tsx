@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, ImageSourcePropType, Modal, Dimensions, Animated, Easing } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, Modal, Dimensions, Animated, Easing } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { getApp } from '@react-native-firebase/app';
-import { getAuth, signOut } from '@react-native-firebase/auth';
+import { signOutUser } from '../Database/userService';
+import { fetchCurrentUser } from '../Database/userService';
 
-const menuIcon: ImageSourcePropType = require('../Assets/Icons/menuIcon.png');
+
+import { menuIcon } from '../Assets/Icons';
 
 type RootStackParamList = {
   Login: undefined;
@@ -18,8 +19,10 @@ const BurgerMenu = () => {
     const [visible, setVisible] = useState(false);
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const slideAnim = useRef(new Animated.Value(sideMenuWidth)).current;
+    const [username, setUsername] = useState<String>();
 
     const openMenu = () => {
+        console.log('open clicked');
         setVisible(true);
         slideAnim.setValue(sideMenuWidth);
         Animated.timing(slideAnim, {
@@ -41,10 +44,8 @@ const BurgerMenu = () => {
 
     const handleLogout = async () => {
         try {
-            const app = getApp();
-            const authInstance = getAuth(app);
-            await signOut(authInstance);
-            closeMenu();
+            await signOutUser();
+            closeMenu(); 
             navigation.replace('Login');
         } catch (error: any) {
             console.error("Logout error:", error.message);
@@ -55,6 +56,19 @@ const BurgerMenu = () => {
         closeMenu();
         navigation.replace('Settings');
     };
+
+    useEffect(() => {
+          const loadUser = async() => {
+            const user = await fetchCurrentUser();
+            if (user) {
+                setUsername(user.username);
+            }
+            else {
+                console.log('No user fetched');
+            }
+          };
+          loadUser();
+      }, []);
 
     return (
         <View style={styles.floatingIcon}>
@@ -78,9 +92,9 @@ const BurgerMenu = () => {
                         ]}
                     >
                         <View style={styles.sideMenuTitleCont}>
-                            <Text style={styles.sideMenuTitle}>Hyrkan</Text>
+                            <Text style={styles.sideMenuTitle}>{username}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => console.log("t")} style={styles.sectionBtn}>
+                        <TouchableOpacity onPress={handleSettingsPress} style={styles.sectionBtn}>
                             <Text style={styles.menuItem}>Settings</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handleLogout} style={styles.sectionBtn}>
