@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Platform, PermissionsAndroid, Button } from "react-native";
-import MapView, { Region, Marker, Polyline } from "react-native-maps";
-// import Geolocation, {GeolocationError, GeolocationOptions, GeolocationResponse} from "@react-native-community/geolocation";
-// import { getPathLength, getDistance } from "geolib";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Platform, PermissionsAndroid } from "react-native";
+import MapboxGL from '@rnmapbox/maps';
+import { Coordinate } from "../AppNavigator";
 
-import {Coordinate} from '../AppNavigator';
+MapboxGL.setAccessToken('pk.eyJ1IjoiaHlya2FuIiwiYSI6ImNtaDFvb285MjJjY3Myd3MydTFlangyMWQifQ.ism9_zzBTgz3NG3TISs0bg');
 
 interface Props {
   setCurrentSpeed: (speed: number) => void;
@@ -15,102 +14,72 @@ interface Props {
   distance: number;
   routeCoordinates: Coordinate[];
   setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinate[]>>;
-};
+}
 
-const MapsScreen: React.FC<Props> = ({setCurrentSpeed, setSeconds, setDistance, speed, seconds, distance,
+const MapsScreen: React.FC<Props> = ({
+  setCurrentSpeed, setSeconds, setDistance, speed, seconds, distance,
   setRouteCoordinates, routeCoordinates
 }) => {
-  const [locationPermission, setLocationPermission] = useState<
-    'granted' | 'denied' | 'unavailable' | 'blocked' | 'limited' | 'loading'
-  >('loading');
-
-  const [region, setRegion] = useState<Region>({
-    latitude: 13.9411,
-    longitude: 121.1624,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  });
+  const [showUserLocation, setShowUserLocation] = useState(false);
+  const [region, setRegion] = useState({ latitude: 13.9411, longitude: 121.1624 });
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // console.log('Location permission granted');
-          setLocationPermission('granted');
-        } else {
-          console.log('Location permission denied');
-          setLocationPermission('denied');
-        }
-      } catch (error) {
-        console.warn('Permission request failed', error);
-        setLocationPermission('unavailable');
-      }
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) setShowUserLocation(true);
+    } else {
+      setShowUserLocation(true);
     }
   };
-
-  const onRegionChange = (newRegion: Region) => {
-    // setRegion(newRegion);
-    // console.log("Region changes:", newRegion);
-  };
-
-  const [showUserLocation, setShowUserLocation] = useState(false);
-
-  const onMapReady = () => {
-    setShowUserLocation(true);
-  }
 
   useEffect(() => {
-     const handlePermission = async () => {
-      await requestLocationPermission(); // Await here if it's async
-    };
+    requestLocationPermission();
+  }, []);
 
-    handlePermission();
-  });
+  const formatTime = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
-  const formatTime = (totalSeconds : number) => {
-        const mins = Math.floor(totalSeconds/60);
-        const secs = totalSeconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    return (
+  return (
     <View style={styles.body}>
-      <View style={styles.background}>
-        <View style={styles.container}>
-          <MapView
-            provider="google"
-            style={styles.map}
-            initialRegion={region}
-            onRegionChangeComplete={onRegionChange}
-            onMapReady={onMapReady}
-            showsUserLocation={showUserLocation}
-            showsMyLocationButton={true}
-            followsUserLocation={true}
-            showsCompass={true}
-            loadingEnabled={true}
-            zoomControlEnabled={true}
-            zoomEnabled={true}
-            minZoomLevel={1}
-          >
-            {routeCoordinates.length > 0 && (
-              <Polyline
-                coordinates={routeCoordinates}
-                strokeColor="#00BFFF"
-                strokeWidth={7}
-              />
-            )}
-            
-          </MapView>
+      <View style={styles.container}>
+        <MapboxGL.MapView
+          style={styles.map}
+          styleURL="mapbox://styles/mapbox/streets-v12"
+          onDidFinishLoadingMap={() => setShowUserLocation(true)}
+        >
+          <MapboxGL.Camera
+            zoomLevel={15}
+            followUserLocation={true}
+            followUserMode="normal"
+          />
 
-          <View style={styles.meter}>
-              <Text style={styles.meterText}>{formatTime(seconds)}</Text>
-              <Text style={styles.meterText}>{distance.toFixed(2)} km</Text>
-              <Text style={styles.meterText}>{speed.toFixed(2)} km/h</Text>
-          </View>
+          <MapboxGL.UserLocation visible={showUserLocation} />
+
+          {routeCoordinates.length > 0 && (
+            <MapboxGL.ShapeSource
+              id="routeLine"
+              shape={{
+                type: "Feature",
+                geometry: {
+                  type: "LineString",
+                  coordinates: routeCoordinates.map(coord => [coord.longitude, coord.latitude]),
+                },
+              }}
+            >
+              <MapboxGL.LineLayer id="routeLineLayer" style={{ lineColor: "#00BFFF", lineWidth: 7 }} />
+            </MapboxGL.ShapeSource>
+          )}
+        </MapboxGL.MapView>
+
+        <View style={styles.meter}>
+          <Text style={styles.meterText}>{formatTime(seconds)}</Text>
+          <Text style={styles.meterText}>{distance.toFixed(2)} km</Text>
+          <Text style={styles.meterText}>{speed.toFixed(2)} km/h</Text>
         </View>
       </View>
     </View>
@@ -119,7 +88,6 @@ const MapsScreen: React.FC<Props> = ({setCurrentSpeed, setSeconds, setDistance, 
 
 const styles = StyleSheet.create({
   body: {
-    // backgroundColor: "lightblue",
     height: "100%",
     width: "100%",
     justifyContent: "flex-end",
@@ -130,13 +98,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 16,
     borderColor: "#FFA733",
   },
-  background: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: "#1f1c1b",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   container: {
     height: "95%",
     width: "95%",
@@ -144,33 +105,17 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  overlay: {
-    position: 'absolute',
-    top: 11,
-    left: 60,
-    right: 20,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 10,
-    padding: 10,
-    zIndex: 10,
-    width: "65%",
-  },
-  permissionMessage: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   meter: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     left: 70,
     right: 70,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(31, 28, 27, 0.9)',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "rgba(31, 28, 27, 0.9)",
     padding: 10,
     borderRadius: 10,
-    },
+  },
   meterText: {
     fontWeight: "bold",
     color: "#FFA733",
