@@ -32,14 +32,17 @@ export type Coordinate = {
 };
 
   const AppNavigator = () => {
-  const [currentSpeed, setCurrentSpeed] = useState<number>(0);
-  const [seconds, setSeconds] = useState(0);
-  const [distance, setDistance] = useState(0);
-  const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
-  const [monsterExp, setMonsterExp] = useState<number>(0);
-  const [monsterLvl, setMonsterLvl] = useState<number>(0);
+    const [isRecording, setIsRecording] = useState(false);
+    const [currentSpeed, setCurrentSpeed] = useState<number>(0);
+    const [seconds, setSeconds] = useState(0);
+    const [distance, setDistance] = useState(0);
+    const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
+    const [monsterExp, setMonsterExp] = useState<number>(0);
+    const [monsterLvl, setMonsterLvl] = useState<number>(0);
 
-  const [user, setUser] = useState<User | null>(null);
+    const [maxExp, setMaxExp] = useState<number>(10);
+
+    const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -80,6 +83,7 @@ export type Coordinate = {
               monsterExp={monsterExp}
               monsterLvl={monsterLvl}
               setMonsterLvl={setMonsterLvl}
+              maxExp={maxExp}
             />
           )}
         </Tab.Screen>
@@ -112,6 +116,7 @@ export type Coordinate = {
               distance={distance}
               setRouteCoordinates={setRouteCoordinates}
               routeCoordinates={routeCoordinates}
+              isRecording={isRecording}
             />
           )}
         </Tab.Screen>
@@ -147,6 +152,9 @@ export type Coordinate = {
               monsterExp={monsterExp}
               setMonsterExp={setMonsterExp}
               setMonsterLvl={setMonsterLvl}
+              isRecording={isRecording}
+              setIsRecording={setIsRecording}
+              maxExp={maxExp}
             />
           )}
         </Tab.Screen>

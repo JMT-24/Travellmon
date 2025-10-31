@@ -20,13 +20,16 @@ interface Props {
     setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinate[]>>;
     monsterExp: number;
     setMonsterExp: React.Dispatch<React.SetStateAction<number>>;
-    setMonsterLvl: (lvl: number) => void;
+    setMonsterLvl: React.Dispatch<React.SetStateAction<number>>;
+    isRecording: boolean;
+    setIsRecording: (recording: boolean) => void;
+    maxExp: number;
 };
 
 const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds, setDistance, distance,
-    routeCoordinates, setRouteCoordinates, monsterExp, setMonsterExp, setMonsterLvl
+    routeCoordinates, setRouteCoordinates, monsterExp, setMonsterExp, setMonsterLvl, isRecording, setIsRecording,
+    maxExp
 }) => {
-    const [isRecording, setIsRecording] = useState(false);
     const [paused, setPaused] = useState(false); // <-- new state
     const watchId = useRef<number | null>(null);
     const speedResetTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -241,9 +244,26 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
         leftoverDistance.current = totalDelta % 100; // carry over leftover meters
 
         if (expGained > 0) {
-        setMonsterExp((prev: number) => prev + expGained);
+            setMonsterExp((prevExp) => {
+            let newExp = prevExp + expGained;
+            let newLvl = 0;
+
+            // Handle level-ups (including overflow EXP)
+            while (newExp >= maxExp) {
+                newExp -= maxExp;
+                newLvl += 1;
+            }
+
+            // Apply level-ups if any
+            if (newLvl > 0) {
+                setMonsterLvl((prevLvl) => prevLvl + newLvl);
+            }
+
+            return newExp;
+            });
         }
-        setMonsterLvl(Math.floor(monsterExp / 10))
+
+        
 
         prevDistance.current = distanceInMeters;
     }, [routeCoordinates]);

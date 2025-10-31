@@ -1,9 +1,7 @@
 import React , {useState, useEffect}from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
-import { getApp } from "@react-native-firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "@react-native-firebase/auth";
-import { getFirestore, doc, setDoc, serverTimestamp } from "@react-native-firebase/firestore";
+import { registerUser } from "../Database/userService";
 
 const RegisterScreen = ({navigation}: any) => {
     const [email, setEmail] = useState("");
@@ -31,38 +29,21 @@ const RegisterScreen = ({navigation}: any) => {
     }
 
     const register = async () => {
-    console.log("register button is clicked");
+        console.log("register button is clicked");
 
-        // ✅ Check if passwords match
         if (password !== cpassword) {
             console.log("Passwords do not match!");
             return;
         }
 
         try {
-            const app = getApp();
-            const authInstance = getAuth(app);
-            const firestore = getFirestore(app); // use same app instance
-            const userCredentials = await createUserWithEmailAndPassword(authInstance, email, password);
-            const user = userCredentials.user;
-
-            // Firestore entry for user
-            await setDoc(doc(firestore, "users", user.uid), {
-                email: user.email,
-                username: username,
-                createdAt: serverTimestamp(),
-            });
-
-            console.log('User has registered: ', user.email);
+            await registerUser(username, email, password);
+            console.log('User has registered: ', email);
         } catch (error: any) {
             console.log("Error message: ", error.message);
             console.log("Registration failed: " + error.message);
         }
-
-        console.log("should be done");
     };
-
-    
 
     return (
         <View style={styles.container}>

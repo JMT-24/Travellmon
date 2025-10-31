@@ -9,16 +9,35 @@ interface Props {
 };
 
 const ExpBar: React.FC<Props> = ({monsterExp, monsterLvl, maxExp}) => {
-    const expPercent = monsterExp / maxExp;
     const animatedWidth = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        Animated.timing(animatedWidth, {
-            toValue: expPercent,
+        // Calculate current exp percentage (clamped between 0 and 1)
+        const percent = Math.min(monsterExp / maxExp, 1);
+
+        if (monsterExp >= maxExp) {
+            // First animate to 100% (fill up bar)
+            Animated.timing(animatedWidth, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: false,
+            }).start(() => {
+            // Once full, animate reset to 0 smoothly
+            Animated.timing(animatedWidth, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: false,
+            }).start();
+            });
+        } else {
+            // Normal exp gain animation
+            Animated.timing(animatedWidth, {
+            toValue: percent,
             duration: 500,
-            useNativeDriver: false, // false because we animate width
-        }).start();
-    }, [expPercent]);
+            useNativeDriver: false,
+            }).start();
+        }
+        }, [monsterExp, maxExp]);
 
     const widthInterpolated = animatedWidth.interpolate({
         inputRange: [0, 1],

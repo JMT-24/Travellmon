@@ -1,8 +1,7 @@
 import React , {useState, useEffect}from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
-import { getApp } from "@react-native-firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth";
+import { loginUser } from "../Database/userService";
 
 
 const LoginScreen = ({navigation}: any) => {
@@ -14,13 +13,6 @@ const LoginScreen = ({navigation}: any) => {
         // For example, you could check if the user is already logged in and redirect accordingly
     }, []);
 
-    const handleLogin = () => {
-        // Handle login logic here
-        console.log("Email:", email);
-        console.log("Password:", password);
-        navigation.replace("MainApp"); // Navigate to the main app screen after login
-    };
-
     const handleEmailChange = (text: string) => {
         setEmail(text);
     };
@@ -28,34 +20,26 @@ const LoginScreen = ({navigation}: any) => {
         setPassword(text);
     };
 
-    const handleLoginPress = () => {
-        if (email && password) { 
-            // handleLogin();
-            login();
-        } else {
-            console.log("Please enter both email and password");
-        }
-    };
-
     const handleRegBtn = () => {
         navigation.replace("Register");
     }
 
     const login = async () => {
-        console.log("Email:", email);
-        console.log("Password:", password);   
         console.log("login button is clicked");
         try {
-            const app = getApp();
-            const authInstance = getAuth(app);
-            const userCredentials = await signInWithEmailAndPassword(authInstance, email, password);
-            console.log("logged in: ", userCredentials.user.email);
+            await loginUser(email, password);
             handleLogin();
         } catch (error: any) {
             console.error("login error: ", error.message);
         }
-        console.log("should be done");
     }
+
+    const handleLogin = () => {
+        // Handle login logic here
+        console.log("Email:", email);
+        console.log("Password:", password);
+        navigation.replace("MainApp"); // Navigate to the main app screen after login
+    };
 
     return (
         <View style={styles.container}>

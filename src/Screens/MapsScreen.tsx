@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Platform, PermissionsAndroid } from "react-native";
-import MapboxGL from '@rnmapbox/maps';
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, StyleSheet, Platform, PermissionsAndroid, TouchableOpacity } from "react-native";
+import MapboxGL from "@rnmapbox/maps";
 import { Coordinate } from "../AppNavigator";
+// @ts-ignore
+import Icon from "react-native-vector-icons/MaterialIcons";
 
-MapboxGL.setAccessToken('pk.eyJ1IjoiaHlya2FuIiwiYSI6ImNtaDFvb285MjJjY3Myd3MydTFlangyMWQifQ.ism9_zzBTgz3NG3TISs0bg');
+MapboxGL.setAccessToken(
+  "pk.eyJ1IjoiaHlya2FuIiwiYSI6ImNtaDFvb285MjJjY3Myd3MydTFlangyMWQifQ.ism9_zzBTgz3NG3TISs0bg"
+);
 
 interface Props {
   setCurrentSpeed: (speed: number) => void;
@@ -14,17 +18,27 @@ interface Props {
   distance: number;
   routeCoordinates: Coordinate[];
   setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinate[]>>;
+  isRecording: boolean;
 }
 
 const MapsScreen: React.FC<Props> = ({
-  setCurrentSpeed, setSeconds, setDistance, speed, seconds, distance,
-  setRouteCoordinates, routeCoordinates
+  setCurrentSpeed,
+  setSeconds,
+  setDistance,
+  speed,
+  seconds,
+  distance,
+  setRouteCoordinates,
+  routeCoordinates,
+  isRecording,
 }) => {
   const [showUserLocation, setShowUserLocation] = useState(false);
-  const [region, setRegion] = useState({ latitude: 13.9411, longitude: 121.1624 });
+  const [zoomLevel, setZoomLevel] = useState(13);
+  const [followUser, setFollowUser] = useState(true);
+  const cameraRef = useRef<MapboxGL.Camera>(null);
 
   const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
       );
@@ -38,6 +52,49 @@ const MapsScreen: React.FC<Props> = ({
     requestLocationPermission();
   }, []);
 
+  // Move camera to user location
+  const flyToUserLocation = async () => {
+    try {
+      const location = await MapboxGL.locationManager.getLastKnownLocation();
+      if (location && cameraRef.current) {
+        // const coords = [location.coords.longitude, location.coords.latitude];
+        // cameraRef.current.flyTo(coords, 1000);
+        setFollowUser(true);
+      }
+    } catch (err) {
+      console.warn("Error fetching user location", err);
+    }
+  };
+
+  // Auto move to user when map loads first
+  const onMapLoaded = async () => {
+    setShowUserLocation(true);
+    await flyToUserLocation();
+  };
+
+  // Stop following if user pans the map manually
+  const onRegionWillChange = () => {
+    if (followUser) setFollowUser(false);
+  };
+
+  const zoomIn = () => {
+    const newZoom = zoomLevel + 1;
+    setZoomLevel(newZoom);
+    cameraRef.current?.setCamera({
+      zoomLevel: newZoom,
+      animationDuration: 500,
+    });
+  };
+
+  const zoomOut = () => {
+    const newZoom = zoomLevel - 1;
+    setZoomLevel(newZoom);
+    cameraRef.current?.setCamera({
+      zoomLevel: newZoom,
+      animationDuration: 500,
+    });
+  };
+
   const formatTime = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
@@ -49,33 +106,67 @@ const MapsScreen: React.FC<Props> = ({
       <View style={styles.container}>
         <MapboxGL.MapView
           style={styles.map}
+          zoomEnabled
           styleURL="mapbox://styles/mapbox/streets-v12"
-          onDidFinishLoadingMap={() => setShowUserLocation(true)}
+          rotateEnabled
+          scaleBarEnabled={false}
+          onDidFinishLoadingMap={onMapLoaded}
+          onRegionWillChange={onRegionWillChange}
         >
           <MapboxGL.Camera
-            zoomLevel={15}
-            followUserLocation={true}
-            followUserMode="normal"
+            ref={cameraRef}
+            followUserLocation={followUser}
+            followZoomLevel={zoomLevel}
+            animationMode="flyTo"
+            animationDuration={1000}
           />
 
           <MapboxGL.UserLocation visible={showUserLocation} />
 
-          {routeCoordinates.length > 0 && (
+          {routeCoordinates.length > 1 && (
             <MapboxGL.ShapeSource
-              id="routeLine"
+              id="routeSource"
               shape={{
                 type: "Feature",
                 geometry: {
                   type: "LineString",
-                  coordinates: routeCoordinates.map(coord => [coord.longitude, coord.latitude]),
+                  coordinates: routeCoordinates.map((coord) => [
+                    coord.longitude,
+                    coord.latitude,
+                  ]),
                 },
+                properties: {},
               }}
             >
-              <MapboxGL.LineLayer id="routeLineLayer" style={{ lineColor: "#00BFFF", lineWidth: 7 }} />
+              <MapboxGL.LineLayer
+                id="routeLine"
+                style={{
+                  lineColor: "#FF0000",
+                  lineWidth: 3,
+                  lineJoin: "round",
+                  lineCap: "round",
+                }}
+              />
             </MapboxGL.ShapeSource>
           )}
         </MapboxGL.MapView>
 
+        {/* Buttons */}
+        <View style={styles.buttons}>
+          <TouchableOpacity style={styles.button} onPress={flyToUserLocation}>
+            <Icon name="my-location" style={styles.icon} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={zoomIn}>
+            <Icon name="zoom-in" style={styles.icon} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={zoomOut}>
+            <Icon name="zoom-out" style={styles.icon} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Meter Display */}
         <View style={styles.meter}>
           <Text style={styles.meterText}>{formatTime(seconds)}</Text>
           <Text style={styles.meterText}>{distance.toFixed(2)} km</Text>
@@ -118,6 +209,28 @@ const styles = StyleSheet.create({
   },
   meterText: {
     fontWeight: "bold",
+    color: "#FFA733",
+  },
+  buttons: {
+    position: "absolute",
+    bottom: 30,
+    right: 10,
+    flexDirection: "column",
+    justifyContent: "space-around",
+    padding: 10,
+    borderRadius: 10,
+  },
+  button: {
+    width: 42,
+    height: 42,
+    backgroundColor: "rgba(31, 28, 27, 0.9)",
+    borderRadius: 21,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  icon: {
+    fontSize: 22,
     color: "#FFA733",
   },
 });
