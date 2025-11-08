@@ -39,6 +39,7 @@ const RegisterScreen = ({navigation}: any) => {
         try {
             await registerUser(username, email, password);
             console.log('User has registered: ', email);
+            navigation.replace("Login");
         } catch (error: any) {
             console.log("Error message: ", error.message);
             console.log("Registration failed: " + error.message);

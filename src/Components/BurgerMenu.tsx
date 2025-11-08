@@ -45,16 +45,23 @@ const BurgerMenu = () => {
     const handleLogout = async () => {
         try {
             await signOutUser();
-            closeMenu(); 
+            setTimeout(() => {
+            closeMenu();
             navigation.replace('Login');
+            }, 0);
         } catch (error: any) {
             console.error("Logout error:", error.message);
         }
     };
 
+
     const handleSettingsPress = () => {
         closeMenu();
         navigation.replace('Settings');
+    };
+
+    const handleMonsterPress = () => {
+        console.log("monster press");
     };
 
     useEffect(() => {
@@ -94,6 +101,9 @@ const BurgerMenu = () => {
                         <View style={styles.sideMenuTitleCont}>
                             <Text style={styles.sideMenuTitle}>{username}</Text>
                         </View>
+                        <TouchableOpacity onPress={handleMonsterPress} style={styles.sectionBtn}>
+                            <Text style={styles.menuItem}>VitaMonsters</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={handleSettingsPress} style={styles.sectionBtn}>
                             <Text style={styles.menuItem}>Settings</Text>
                         </TouchableOpacity>

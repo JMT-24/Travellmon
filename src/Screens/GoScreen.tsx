@@ -225,7 +225,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
         stopRecording();
         setRouteCoordinates([]);
         resetTimer();
-        setMonsterExp(0);
+        // setMonsterExp(0);
     };
 
     const pause = () => {
@@ -246,18 +246,18 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
         if (expGained > 0) {
             setMonsterExp((prevExp) => {
             let newExp = prevExp + expGained;
-            let newLvl = 0;
+            // let newLvl = 0;
 
-            // Handle level-ups (including overflow EXP)
-            while (newExp >= maxExp) {
-                newExp -= maxExp;
-                newLvl += 1;
-            }
+            // // Handle level-ups (including overflow EXP)
+            // while (newExp >= maxExp) {
+            //     newExp -= maxExp;
+            //     newLvl += 1;
+            // }
 
-            // Apply level-ups if any
-            if (newLvl > 0) {
-                setMonsterLvl((prevLvl) => prevLvl + newLvl);
-            }
+            // // Apply level-ups if any
+            // if (newLvl > 0) {
+            //     setMonsterLvl((prevLvl) => prevLvl + newLvl);
+            // }
 
             return newExp;
             });

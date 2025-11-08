@@ -1,10 +1,13 @@
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword} from "@react-native-firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "@react-native-firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, addDoc, collection } from "@react-native-firebase/firestore";
 import { Timestamp } from "@react-native-firebase/firestore";
 import firestore from '@react-native-firebase/firestore';
 
 import { User } from "../Models/User";
+import { VitaMonster } from "../Models/VitaMonster";
+
+import { newUserMonster } from "./monsterService";
 
 export const getCurrentUser = () => {
   const auth = getAuth(getApp());
@@ -65,10 +68,17 @@ export const registerUser = async (username: string, email: string, password: st
     const userCredentials = await createUserWithEmailAndPassword(authInstance, email, password);
     const user = userCredentials.user;
 
-    // Firestore entry for user
-    await setDoc(doc(firestore, "users", user.uid), {
-        email: user.email,
+    const userData: User = {
+        uid: user.uid,
+        email: user.email ?? "",
         username: username,
-        createdAt: serverTimestamp(),
-    });
+        createdAt: serverTimestamp() as any,
+    };
+
+    console.log("userData:", userData);
+    console.log("newUserMonster:", newUserMonster());
+
+    // Firestore entry for user
+    await setDoc(doc(firestore, "users", user.uid), userData);
+    await addDoc(collection(firestore, "users", user.uid, "vitamonsters"), newUserMonster())
 };

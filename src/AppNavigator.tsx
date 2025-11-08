@@ -5,9 +5,11 @@ import { NavigationContainer } from '@react-navigation/native';
 
 //Services
 import { fetchCurrentUser } from './Database/userService';
+import { fetchUserMonsters } from './Database/monsterService';
 
 //Models
 import { User } from './Models/User';
+import { Monster } from './Models/VitaMonster';
 
 // Screens
 import HomeScreen from './Screens/HomeScreen';
@@ -39,25 +41,35 @@ export type Coordinate = {
     const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
     const [monsterExp, setMonsterExp] = useState<number>(0);
     const [monsterLvl, setMonsterLvl] = useState<number>(0);
-
     const [maxExp, setMaxExp] = useState<number>(10);
 
     const [user, setUser] = useState<User | null>(null);
+    const [monsters, setMonsters] = useState<Monster[]>([]);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      const user = await fetchCurrentUser();
+    useEffect(() => {
+      const loadUser = async () => {
+        const user = await fetchCurrentUser();
+        if (user) {
+          setUser(user);
+          fetchUserMonsters(user.uid).then(
+            (mons) => {
+              setMonsters(mons);
+            });
+        } else {
+          console.log('No user fetched');
+        }
+      };
+
+      loadUser();
+    }, []);
+
+    const reloadMonsters = async () => {
       if (user) {
-        setUser(user);
-      } else {
-        console.log('No user fetched');
+        const mons = await fetchUserMonsters(user.uid);
+        setMonsters(mons);
       }
     };
-
-    loadUser();
-  }, []);
-
-  
+      
   return (
     <Tab.Navigator tabBar={props => <CustomTabBar {...props} />}>
 
@@ -80,10 +92,13 @@ export type Coordinate = {
         >
           {() => (
             <HomeScreen
-              monsterExp={monsterExp}
+              offlineExp={monsterExp}
               monsterLvl={monsterLvl}
-              setMonsterLvl={setMonsterLvl}
+              setMonsterExp={setMonsterExp}
               maxExp={maxExp}
+              user={user}
+              monsters={monsters}
+              reloadMonsters={reloadMonsters}
             />
           )}
         </Tab.Screen>

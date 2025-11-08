@@ -20,7 +20,7 @@ const CustomTabBar: React.FC<Props> = ({ state, descriptors, navigation }) => {
           }
         };
 
-        const color = isFocused ? '#FFD700' : "#5A3200";
+        const color = isFocused ? '#FFEA00' : "#5A3200";
         const size = 30;
 
         return (

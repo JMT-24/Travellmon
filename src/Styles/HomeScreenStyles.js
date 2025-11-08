@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: "4%",
+        paddingTop: 70,
         // borderWidth: 2,
     },
     nameContainer: {
@@ -64,7 +65,30 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         opacity: 0.25,
     },
-
+    btnStyle: {
+        backgroundColor: '#FFA733',
+        height: "10%",
+        width: "50%",
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: "center",
+        borderWidth: 2,
+        borderColor: '#FFD700',
+        elevation: 5,
+        shadowColor: "#5A3200",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+        marginTop: 20,
+    },
+    disabledButton: {
+        opacity: 0.5,
+    },
+    buttonText: {
+        color: "#5A3200",
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
     });
 
 export default styles;
