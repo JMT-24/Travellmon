@@ -20,14 +20,17 @@ const ProfileScreen: React.FC<Props> = ({user}) => {
                         <Text style={styles.userLevelText}>Level 0</Text>
                     </View>
                     <View style={styles.section}>
-                        <ScrollView horizontal={true} style={styles.userDetailCont} showsHorizontalScrollIndicator={false}>
+                        <ScrollView horizontal={true} style={styles.userDetailCont} 
+                        showsHorizontalScrollIndicator={false} 
+                        contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
+                        >
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Vita Skill</Text>
+                                <Text style={styles.detailBoxText}>Life Path</Text>
                             </View>
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Login Streak</Text>
+                                <Text style={styles.detailBoxText}>Path Streak</Text>
                             </View>
 
                             <View style={styles.detailBox}>

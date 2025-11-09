@@ -9,7 +9,7 @@ import { fetchUserMonsters } from './Database/monsterService';
 
 //Models
 import { User } from './Models/User';
-import { Monster } from './Models/VitaMonster';
+import { VitaMonster } from './Models/VitaMonster';
 
 // Screens
 import HomeScreen from './Screens/HomeScreen';
@@ -44,7 +44,7 @@ export type Coordinate = {
     const [maxExp, setMaxExp] = useState<number>(10);
 
     const [user, setUser] = useState<User | null>(null);
-    const [monsters, setMonsters] = useState<Monster[]>([]);
+    const [monsters, setMonsters] = useState<VitaMonster[]>([]);
 
     useEffect(() => {
       const loadUser = async () => {
@@ -164,12 +164,10 @@ export type Coordinate = {
               distance={distance}
               setRouteCoordinates={setRouteCoordinates}
               routeCoordinates={routeCoordinates}
-              monsterExp={monsterExp}
               setMonsterExp={setMonsterExp}
-              setMonsterLvl={setMonsterLvl}
               isRecording={isRecording}
               setIsRecording={setIsRecording}
-              maxExp={maxExp}
+              user={user}
             />
           )}
         </Tab.Screen>

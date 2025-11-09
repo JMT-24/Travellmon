@@ -1,11 +1,11 @@
 import { getApp } from "@react-native-firebase/app";
-import { Monster } from "../Models/VitaMonster"
+import { VitaMonster } from "../Models/VitaMonster"
 import { collection, getDocs, getFirestore, updateDoc, doc } from "@react-native-firebase/firestore";
 
 
-export const newUserMonster = (): Monster => {
-    const wokamon = new Monster({
-        name: "Woka-mon",
+export const newUserMonster = (monsterName: string): VitaMonster => {
+    const wokamon = new VitaMonster({
+        name: monsterName,
         type: "Physical",
         hp: 20,
         atk: 5,
@@ -20,13 +20,12 @@ export const fetchUserMonsters = async (uid: string) => {
     const firestore = getFirestore(getApp());
     const monsterSnapshots = await getDocs(collection(firestore, "users", uid, "vitamonsters"));
 
-    const monsterArray: Monster[] = [];
+    const monsterArray: VitaMonster[] = [];
 
     monsterSnapshots.forEach(
      (doc) => {
         const data = doc.data();
-        const monster: Monster = {
-            id: doc.id,
+        const monster = new VitaMonster({
             name: data.name,
             type: data.type,
             hp: data.hp,
@@ -34,7 +33,7 @@ export const fetchUserMonsters = async (uid: string) => {
             exp: data.exp,
             level: data.level,
             createdAt: data.createdAt,
-        };
+        });
 
         monsterArray.push(monster);
      }   
@@ -43,9 +42,9 @@ export const fetchUserMonsters = async (uid: string) => {
     return monsterArray;
 }
 
-export const updateMonsterEXP = async (uid: string, monsterid: string, newEXP: number, newLVL: number) => {
+export const updateMonsterEXP = async (uid: string, monsterName: string, newEXP: number, newLVL: number) => {
     const firestore = getFirestore(getApp());
-    await updateDoc(doc(firestore, "users", uid, "vitamonsters", monsterid),
+    await updateDoc(doc(firestore, "users", uid, "vitamonsters", monsterName),
     {
         exp: newEXP,
         level: newLVL,

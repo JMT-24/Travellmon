@@ -4,10 +4,13 @@ import { getFirestore, doc, getDoc, setDoc, serverTimestamp, addDoc, collection 
 import { Timestamp } from "@react-native-firebase/firestore";
 import firestore from '@react-native-firebase/firestore';
 
+//Models
 import { User } from "../Models/User";
-import { VitaMonster } from "../Models/VitaMonster";
 
+//Services
 import { newUserMonster } from "./monsterService";
+import { newLifePath } from "./lifePathService";
+
 
 export const getCurrentUser = () => {
   const auth = getAuth(getApp());
@@ -74,11 +77,17 @@ export const registerUser = async (username: string, email: string, password: st
         username: username,
         createdAt: serverTimestamp() as any,
     };
-
     console.log("userData:", userData);
-    console.log("newUserMonster:", newUserMonster());
+
+    let pathName = await getUserLifePath();
+    let monsterName = "Woka-mon";
 
     // Firestore entry for user
     await setDoc(doc(firestore, "users", user.uid), userData);
-    await addDoc(collection(firestore, "users", user.uid, "vitamonsters"), newUserMonster())
+    await setDoc(doc(firestore, "users", user.uid, "vitamonsters", monsterName), newUserMonster(monsterName))
+    await setDoc(doc(firestore, "users", user.uid, "lifePaths", pathName), newLifePath(pathName))
 };
+
+const getUserLifePath = () => {
+    return "Path of Motion";
+}

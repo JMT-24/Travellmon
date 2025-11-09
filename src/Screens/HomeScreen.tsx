@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Button, Image, ImageSourcePropType, Modal
 import styles from '../Styles/HomeScreenStyles';
 
 import { User } from "../Models/User";
-import { Monster } from '../Models/VitaMonster';
+import { VitaMonster } from '../Models/VitaMonster';
 import { updateMonsterEXP } from '../Database/monsterService';
 
 //Components
@@ -18,13 +18,13 @@ interface Props {
     maxExp: number;
     setMonsterExp: React.Dispatch<React.SetStateAction<number>>
     user: User | null;
-    monsters: Monster[];
+    monsters: VitaMonster[];
     reloadMonsters: () => Promise<void>;
 };
 
 const HomeScreen: React.FC<Props> = ({ offlineExp, monsterLvl, setMonsterExp , maxExp, user, monsters, reloadMonsters}) => {
 
-    const [currentMonster, setCurrentMonster] = useState<Monster>();
+    const [currentMonster, setCurrentMonster] = useState<VitaMonster>();
 
     const loadWokamon = () => {
         if (monsters && monsters.length > 0) {
@@ -48,7 +48,7 @@ const HomeScreen: React.FC<Props> = ({ offlineExp, monsterLvl, setMonsterExp , m
             return;
         }
         
-        var monsterID = currentMonster.id;
+        var monsterName = currentMonster.name;
         var monsterEXP = currentMonster.exp;
         var monsterLVL = currentMonster.level;
 
@@ -61,13 +61,13 @@ const HomeScreen: React.FC<Props> = ({ offlineExp, monsterLvl, setMonsterExp , m
             newExp = updatedEXP % maxExp;
         }
 
-        if (!monsterID)
+        if (!monsterName)
         {
-            console.error("Cannot find current monster uid");
+            console.error("Cannot find current monster");
             return;
         }
 
-        await updateMonsterEXP(user.uid, monsterID, newExp, newLevel);
+        await updateMonsterEXP(user.uid, monsterName, newExp, newLevel);
         setMonsterExp(0);
         await reloadMonsters();
         await loadWokamon();

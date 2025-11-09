@@ -7,6 +7,8 @@ import { Coordinate } from '../AppNavigator';
 import Video from 'react-native-video';
 
 import MeasureCard from '../Components/MeasureCard';
+import { createMotionLog } from '../Database/lifePathService';
+import { User } from '../Models/User';
 
 
 interface Props {
@@ -18,17 +20,14 @@ interface Props {
     distance: number;
     routeCoordinates: Coordinate[];
     setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinate[]>>;
-    monsterExp: number;
     setMonsterExp: React.Dispatch<React.SetStateAction<number>>;
-    setMonsterLvl: React.Dispatch<React.SetStateAction<number>>;
     isRecording: boolean;
     setIsRecording: (recording: boolean) => void;
-    maxExp: number;
+    user: User | null;
 };
 
 const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds, setDistance, distance,
-    routeCoordinates, setRouteCoordinates, monsterExp, setMonsterExp, setMonsterLvl, isRecording, setIsRecording,
-    maxExp
+    routeCoordinates, setRouteCoordinates, setMonsterExp, isRecording, setIsRecording, user
 }) => {
     const [paused, setPaused] = useState(false); // <-- new state
     const watchId = useRef<number | null>(null);
@@ -92,24 +91,32 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
         );
     };
 
-    const stopRecording = () => {
+    const stopRecording = async () => {
         setIsWalking(false);
         setIsRecording(false);
         setPaused(false); // <-- reset paused state
         stopTimer();
+
+        if (user?.uid) {
+            await createMotionLog(user.uid, distance, seconds);
+            console.log("log should have been made");
+        }
+
         if (watchId.current !== null) {
-        Geolocation.clearWatch(watchId.current);
-        watchId.current = null;
+            Geolocation.clearWatch(watchId.current);
+            watchId.current = null;
         }
 
         // Clear speed reset timer when stopping
         if (speedResetTimeout.current) {
-        clearTimeout(speedResetTimeout.current);
-        speedResetTimeout.current = null;
+            clearTimeout(speedResetTimeout.current);
+            speedResetTimeout.current = null;
         }
 
         // Also reset speed to 0 when stopping
         setCurrentSpeed(0);
+        resetTimer();
+        setRouteCoordinates([]);
     };
 
     const pauseRecording = () => {
@@ -208,7 +215,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
     };
 
     const resetTimer = () => {
-        stopTimer();
+        // stopTimer();
         setSeconds(0);
     };
 
@@ -222,7 +229,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
     const leftoverDistance = useRef(0); // meters
 
     const resetRoute = () => {
-        stopRecording();
+        // stopRecording();
         setRouteCoordinates([]);
         resetTimer();
         // setMonsterExp(0);
