@@ -5,6 +5,7 @@ import styles from '../Styles/HomeScreenStyles';
 import { User } from "../Models/User";
 import { VitaMonster } from '../Models/VitaMonster';
 import { updateMonsterEXP } from '../Database/monsterService';
+import { uploadLogs } from '../Database/lifePathService';
 
 //Components
 import ExpBar from '../Components/ExpBar';
@@ -14,7 +15,6 @@ const monsterPic: ImageSourcePropType = require('../Assets/Img/placeholderMonste
 
 interface Props {
     offlineExp: number;
-    monsterLvl: number;
     maxExp: number;
     setMonsterExp: React.Dispatch<React.SetStateAction<number>>
     user: User | null;
@@ -22,7 +22,7 @@ interface Props {
     reloadMonsters: () => Promise<void>;
 };
 
-const HomeScreen: React.FC<Props> = ({ offlineExp, monsterLvl, setMonsterExp , maxExp, user, monsters, reloadMonsters}) => {
+const HomeScreen: React.FC<Props> = ({ offlineExp, setMonsterExp , maxExp, user, monsters, reloadMonsters}) => {
 
     const [currentMonster, setCurrentMonster] = useState<VitaMonster>();
 
@@ -71,6 +71,7 @@ const HomeScreen: React.FC<Props> = ({ offlineExp, monsterLvl, setMonsterExp , m
         setMonsterExp(0);
         await reloadMonsters();
         await loadWokamon();
+        await uploadLogs();
     }
 
     return (

@@ -1,15 +1,45 @@
 import React from "react";
+import { useState, useCallback } from "react";
 import {View, Text, ScrollView} from "react-native";
 import {StyleSheet} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+
 import { User } from "../Models/User";
+import { DocumentData } from 'firebase/firestore';
 
 import UserDataBox from "../Components/userDataBox";
+
+import { getUserPathStats, getUserLifePaths } from "../Database/userService";
 
 interface Props {
     user: User | null;
 }
 
 const ProfileScreen: React.FC<Props> = ({user}) => {
+    const [userPathData, setUserPathData] = useState<DocumentData | undefined> (undefined);
+    const [pathNames, setPathNames] = useState<string | null>(null);
+
+    const handlePath = async () => {
+        if (user)
+        {
+            let data = await getUserPathStats(user.uid);
+            setUserPathData(data);
+            let pathnames = await getUserLifePaths(user.uid);
+            setPathNames(pathnames[0]);
+        }
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            console.log("Profile screen is focused");
+            handlePath();
+
+            return () => {
+                console.log("Unfocused");
+            };
+        }, [])
+    );
+
     return (
         <View style={styles.body}>
             <View style={styles.background}>
@@ -26,23 +56,24 @@ const ProfileScreen: React.FC<Props> = ({user}) => {
                         >
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Life Path</Text>
+                                {/* <Text style={styles.detailBoxText}>Life Path</Text> */}
+                                <Text style={styles.detailBoxText}>{`${pathNames}`}</Text>
                             </View>
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Path Streak</Text>
+                                <Text style={styles.detailBoxText}>Path Streak: 0</Text>
                             </View>
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Monsters Owned</Text>
+                                <Text style={styles.detailBoxText}>Monsters Owned: 0</Text>
                             </View>
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Totems earned</Text>
+                                <Text style={styles.detailBoxText}>Totems earned: 0</Text>
                             </View>
 
                             <View style={styles.detailBox}>
-                                <Text style={styles.detailBoxText}>Player Rank</Text>
+                                <Text style={styles.detailBoxText}>Player Rank: 0</Text>
                             </View>
                         </ScrollView>
                     </View>
@@ -50,27 +81,27 @@ const ProfileScreen: React.FC<Props> = ({user}) => {
                     <View style={styles.section}>
                         <UserDataBox 
                         dataLabel={"Distance Covered Today"}
-                        dataValue={"1 km"} />
+                        dataValue={"---"} />
 
                         <UserDataBox 
                         dataLabel={"Time Spent Moving Today"}
-                        dataValue={"24m 11s"} />
+                        dataValue={"---"} />
 
                         <UserDataBox 
                         dataLabel={"Longest Distance Covered"}
-                        dataValue={"10 km"} />
+                        dataValue={"---"} />
 
                         <UserDataBox 
                         dataLabel={"Longest Time Spent Moving"}
-                        dataValue={"1h 11m 11s"} />
+                        dataValue={`---`} />
                         
                         <UserDataBox 
                         dataLabel={"Total Distance Covered"}
-                        dataValue={"100 km"} />
+                        dataValue={`${Math.round((userPathData?.totalDistanceCovered ?? 0) * 1000)} meters`} />
                         
                         <UserDataBox 
                         dataLabel={"Total Time Spent Moving"}
-                        dataValue={"10h 24m 11s"} />
+                        dataValue={`${userPathData?.totalTimeSpent} seconds`} />
                     </View>
 
                 </ScrollView>
@@ -142,6 +173,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         justifyContent: "center",
         alignItems: "center",
+        paddingHorizontal: 10,
     },
     detailBoxText: {
         color: "white",

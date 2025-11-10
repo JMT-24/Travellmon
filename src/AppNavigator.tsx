@@ -40,7 +40,6 @@ export type Coordinate = {
     const [distance, setDistance] = useState(0);
     const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
     const [monsterExp, setMonsterExp] = useState<number>(0);
-    const [monsterLvl, setMonsterLvl] = useState<number>(0);
     const [maxExp, setMaxExp] = useState<number>(10);
 
     const [user, setUser] = useState<User | null>(null);
@@ -93,7 +92,6 @@ export type Coordinate = {
           {() => (
             <HomeScreen
               offlineExp={monsterExp}
-              monsterLvl={monsterLvl}
               setMonsterExp={setMonsterExp}
               maxExp={maxExp}
               user={user}

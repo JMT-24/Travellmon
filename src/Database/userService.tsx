@@ -1,8 +1,9 @@
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword} from "@react-native-firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp, addDoc, collection } from "@react-native-firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, addDoc, collection, updateDoc, getDocs } from "@react-native-firebase/firestore";
 import { Timestamp } from "@react-native-firebase/firestore";
 import firestore from '@react-native-firebase/firestore';
+import { increment } from "@react-native-firebase/firestore";
 
 //Models
 import { User } from "../Models/User";
@@ -88,6 +89,30 @@ export const registerUser = async (username: string, email: string, password: st
     await setDoc(doc(firestore, "users", user.uid, "lifePaths", pathName), newLifePath(pathName))
 };
 
-const getUserLifePath = () => {
+export const getUserLifePath = () => {
+    //make a quiz questionnaire to get use feedback on what path of life they want
     return "Path of Motion";
+}
+
+export const getUserPathStats = async (uid: string) => {
+    const lifePath = getUserLifePath();
+    const firestore = getFirestore(getApp());
+    const userDocRef = await getDoc(doc(firestore, 'users', uid, 'lifePaths', lifePath));
+
+    const data = userDocRef.data();
+    if (data)
+    {
+        console.log(data);
+    }
+    return data;
+}
+
+export const getUserLifePaths = async (uid: string) => {
+    console.log("getting user life path");
+    const firestore = getFirestore(getApp());
+    const pathCollection = await getDocs(collection(firestore, 'users', uid, 'lifePaths'));
+    const lifePathNames = pathCollection.docs.map(doc => doc.id);
+
+    console.log(lifePathNames);
+    return lifePathNames;
 }
