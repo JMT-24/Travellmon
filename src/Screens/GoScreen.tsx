@@ -33,12 +33,18 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
     const watchId = useRef<number | null>(null);
     const speedResetTimeout = useRef<NodeJS.Timeout | null>(null);
     const [isWalking, setIsWalking] = useState(false);
+    const [renderedEXP, setRenderedEXP] = useState(0);
+    const [recordStart, setRecordStart] = useState<Date | null>(null);
+    
 
     const startRecording = () => {
         setIsWalking(true);
         setIsRecording(true);
         setPaused(false); // <-- reset paused state
         startTimer();
+
+        const startTime = new Date(); 
+        setRecordStart(startTime); 
 
         const options: GeolocationOptions = {
         enableHighAccuracy: true,
@@ -97,9 +103,16 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
         setPaused(false); // <-- reset paused state
         stopTimer();
 
+        const endTime = new Date(); // <-- local variable
+
         if (user?.uid) {
-            await createMotionLog(user.uid, distance, seconds);
-            console.log("log should have been made");
+            console.log(recordStart, seconds, endTime);
+            if (recordStart != null)
+            {
+                await createMotionLog(user.uid, distance, seconds, renderedEXP, recordStart, endTime);
+                setRenderedEXP(0);
+                console.log("log should have been made");
+            }
         }
 
         if (watchId.current !== null) {
@@ -117,6 +130,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
         setCurrentSpeed(0);
         resetTimer();
         setRouteCoordinates([]);
+        setRecordStart(null);
     };
 
     const pauseRecording = () => {
@@ -228,16 +242,16 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
     const prevDistance = useRef(0); // meters
     const leftoverDistance = useRef(0); // meters
 
-    const resetRoute = () => {
-        // stopRecording();
+    const resetRecording = () => {
+        console.log("reset is clicked");
         setRouteCoordinates([]);
         resetTimer();
-        // setMonsterExp(0);
-    };
+        setRenderedEXP(0);
+        setMonsterExp(0);
 
-    const pause = () => {
-        stopRecording();
-    }
+        const newStrt = new Date();
+        setRecordStart(newStrt);
+    };
 
     useEffect(() => {
         const distanceInMeters = getPathLength(routeCoordinates);
@@ -252,38 +266,24 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
 
         if (expGained > 0) {
             setMonsterExp((prevExp) => {
-            let newExp = prevExp + expGained;
-            // let newLvl = 0;
-
-            // // Handle level-ups (including overflow EXP)
-            // while (newExp >= maxExp) {
-            //     newExp -= maxExp;
-            //     newLvl += 1;
-            // }
-
-            // // Apply level-ups if any
-            // if (newLvl > 0) {
-            //     setMonsterLvl((prevLvl) => prevLvl + newLvl);
-            // }
-
-            return newExp;
+                let newExp = prevExp + expGained;
+                return newExp;
+            });
+            setRenderedEXP((prevEXP) => {
+                let newEXP = prevEXP + expGained;
+                return newEXP;
             });
         }
-
-        
 
         prevDistance.current = distanceInMeters;
     }, [routeCoordinates]);
 
     return (
         <View style={styles.body}>
-            
-
             <View style={styles.monsterDisplayContainer}>
                 <View style={styles.topView}>
                     <Text style={styles.timerText}>{formatTime(seconds)}</Text>
                 </View>
-
                 <View style={styles.midView}>
                     <Video
                         source={require('../Assets/videos/walking.mp4')}
@@ -301,10 +301,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                     <Text style={styles.speedText}>{speed.toFixed(2)} km/h</Text>
                     <Text style={styles.distanceText}>{distance.toFixed(2)} km</Text>
                 </View>
-
-
             </View>
-
             
             <View style={styles.controls}>
                 {!isRecording && !paused && (
@@ -351,7 +348,7 @@ const GoScreen: React.FC<Props> = ({ setCurrentSpeed, speed, setSeconds, seconds
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.btnStyle}
-                    onPress={resetRoute}
+                    onPress={resetRecording}
                     activeOpacity={0.7}
                 >
                     <Text style={styles.buttonText}>Reset</Text>
