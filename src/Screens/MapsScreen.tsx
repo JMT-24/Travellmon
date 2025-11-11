@@ -16,7 +16,7 @@ interface Props {
   seconds: number;
   setDistance: (distance: number) => void;
   distance: number;
-  routeCoordinates: Coordinate[];
+  routeCoordinates: Coonpxrdinate[];
   setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinate[]>>;
   isRecording: boolean;
 }

@@ -12,7 +12,8 @@ import { menuIcon } from '../Assets/Icons';
 type RootStackParamList = {
   Login: undefined;
   MainApp: undefined;
-  Settings: undefined
+  Settings: undefined;
+  MonsterList: undefined;
 };
 
 const BurgerMenu = () => {
@@ -33,14 +34,20 @@ const BurgerMenu = () => {
         }).start();
     };
 
-    const closeMenu = () => {
-        Animated.timing(slideAnim, {
+    const closeMenu = ():Promise<void> => {
+        return new Promise<void>(resolve => {
+            Animated.timing(slideAnim, {
             toValue: sideMenuWidth,
             duration: 300,
             useNativeDriver: true,
             easing: Easing.in(Easing.ease),
-        }).start(() => setVisible(false));
+            }).start(() => {
+            setVisible(false);
+            resolve();
+            });
+        });
     };
+
 
     const handleLogout = async () => {
         try {
@@ -55,13 +62,14 @@ const BurgerMenu = () => {
     };
 
 
-    const handleSettingsPress = () => {
-        closeMenu();
+    const handleSettingsPress = async () => {
+        await closeMenu();
         navigation.replace('Settings');
     };
 
-    const handleMonsterPress = () => {
-        console.log("monster press");
+    const handleMonsterListPress = async () => {
+        await closeMenu();
+        navigation.replace('MonsterList');
     };
 
     useEffect(() => {
@@ -101,7 +109,7 @@ const BurgerMenu = () => {
                         <View style={styles.sideMenuTitleCont}>
                             <Text style={styles.sideMenuTitle}>{username}</Text>
                         </View>
-                        <TouchableOpacity onPress={handleMonsterPress} style={styles.sectionBtn}>
+                        <TouchableOpacity onPress={handleMonsterListPress} style={styles.sectionBtn}>
                             <Text style={styles.menuItem}>VitaMonsters</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handleSettingsPress} style={styles.sectionBtn}>

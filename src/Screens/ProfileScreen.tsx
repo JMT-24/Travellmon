@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useCallback } from "react";
-import {View, Text, ScrollView} from "react-native";
-import {StyleSheet} from "react-native";
+import {View, Text, ScrollView, StyleSheet} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { User } from "../Models/User";

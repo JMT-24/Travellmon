@@ -9,6 +9,7 @@ import AppNavigator from './src/AppNavigator';
 import LoginScreen from './src/Screens/LoginScreen';
 import RegisterScreen from './src/Screens/RegisterScreen';
 import SettingsScreen from './src/Screens/SettingsScreen';
+import MonsterListScreen from './src/Screens/MonsterListScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -43,6 +44,11 @@ const App = () => {
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="MonsterList"
+          component={MonsterListScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
