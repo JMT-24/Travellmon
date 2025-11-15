@@ -52,10 +52,8 @@ const BurgerMenu = () => {
     const handleLogout = async () => {
         try {
             await signOutUser();
-            setTimeout(() => {
-            closeMenu();
+            await closeMenu();
             navigation.replace('Login');
-            }, 0);
         } catch (error: any) {
             console.error("Logout error:", error.message);
         }

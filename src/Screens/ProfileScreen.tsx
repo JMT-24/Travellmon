@@ -34,7 +34,7 @@ const ProfileScreen: React.FC<Props> = ({user}) => {
             handlePath();
 
             return () => {
-                console.log("Unfocused");
+                console.log("Profile screen is Unfocused");
             };
         }, [])
     );

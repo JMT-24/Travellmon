@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, Button, Image, ImageSourcePropType, Modal, StyleSheet } from 'react-native';
 import styles from '../Styles/HomeScreenStyles';
 
@@ -32,9 +33,16 @@ const HomeScreen: React.FC<Props> = ({ offlineExp, setMonsterExp , maxExp, user,
         }
     };
 
-    useEffect(() => {
-        loadWokamon();
-    }, [monsters]);
+    useFocusEffect(
+        useCallback(() => {
+            console.log("Home screen is focused");
+            loadWokamon();
+
+            return () => {
+                console.log("Home screen is Unfocused");
+            };
+        }, [monsters])
+    );
 
     const claimOfflineEXP = async () => {
         if (!user)
@@ -74,6 +82,7 @@ const HomeScreen: React.FC<Props> = ({ offlineExp, setMonsterExp , maxExp, user,
         await uploadLogs();
     }
 
+    
     return (
         <View style={styles.body}>
             <BurgerMenu />
